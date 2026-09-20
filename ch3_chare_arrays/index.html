@@ -1,0 +1,1383 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch3_chare_arrays/">
+      
+      
+        <link rel="prev" href="../ch2_basic_chares/">
+      
+      
+        <link rel="next" href="../ch4_sdag/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 3 — Chare Arrays - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-3-chare-arrays" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 3 — Chare Arrays
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch1_introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch2_basic_chares/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Chare Arrays
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Chare Arrays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-a-chare-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring a Chare Array
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-the-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the Array
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addressing-an-element" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Addressing an Element
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-program-the-ring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Complete Program: The Ring
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A Complete Program: The Ring">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build and run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#several-rings-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several Rings at Once
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#letting-the-sender-choose-the-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Letting the Sender Choose the Receiver
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#splitting-the-program-across-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitting the Program Across Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the Output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-kinds-of-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Kinds of Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch4_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch7_threaded/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 7 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-a-chare-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring a Chare Array
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-the-array" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating the Array
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#addressing-an-element" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Addressing an Element
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-program-the-ring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Complete Program: The Ring
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A Complete Program: The Ring">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build and run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#several-rings-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several Rings at Once
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#letting-the-sender-choose-the-receiver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Letting the Sender Choose the Receiver
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#splitting-the-program-across-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitting the Program Across Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-the-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the Output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-kinds-of-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Kinds of Index
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-3-chare-arrays">Chapter 3: Chare Arrays<a class="headerlink" href="#chapter-3-chare-arrays" title="Permanent link">&para;</a></h1>
+<p>Chapter 2 created chares one at a time. <code>CProxy_Compute::ckNew(pi)</code> makes one chare and
+hands back one proxy. That is enough to express "do these K independent things", which is
+what the primes program did, but it leaves the program holding K unrelated proxies with no
+way to talk about them collectively.</p>
+<p>Most parallel programs want something different: a <strong>collection</strong> of chares that can be
+named by index, operated on as a whole, and used to express a communication pattern.
+A simulation of two-dimensional space wants a chare per tile, where the tile at <code>(i, j)</code>
+exchanges data with <code>(i±1, j)</code> and <code>(i, j±1)</code>. A sort wants element <code>i</code> to talk to element
+<code>i+1</code>. Writing either with individually created chares means building the index-to-proxy
+mapping by hand and shipping it to everyone who needs it.</p>
+<p>A <strong>chare array</strong> is that collection: an indexed set of chares, created in one call,
+addressed by index, and distributed across the processors by the runtime. It is the most
+widely used construct in Charm++, and nearly every program from here on is built from one.</p>
+<p>Chare arrays are indexed by integers in one through six dimensions, and they can also be
+indexed by bit vectors or by strings. They may be <strong>dense</strong> (every index from 0 to n−1
+exists) or <strong>sparse</strong> — a 1D array might hold 10,000 elements with indices scattered over
+the range 10 million to 20 million. This chapter uses dense 1D arrays throughout; the other
+index types are previewed at the end, and covered fully in the chapter on array
+indices.</p>
+<hr />
+<h2 id="declaring-a-chare-array">Declaring a Chare Array<a class="headerlink" href="#declaring-a-chare-array" title="Permanent link">&para;</a></h2>
+<p>A chare array is declared in the <code>.ci</code> file with the <code>array</code> keyword and a dimensionality:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// ring.ci</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="nf">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ringSize</span><span class="p">);</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">doSomething</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromPE</span><span class="p">);</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">};</span>
+</code></pre></div>
+<p>This is the same shape as the <code>chare</code> declaration from Chapter 2 — a constructor and some
+entry methods — with <code>array [1D]</code> in place of <code>chare</code>. As before, <code>charmc</code> generates a
+proxy class, <code>CProxy_Ring</code>.</p>
+<p>The C++ class inherits from <code>CBase_Ring</code>, exactly as an individual chare inherits from
+<code>CBase_Foo</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Ring</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ringSize</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="n">Ring</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="n">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">(</span><span class="n">mp</span><span class="p">),</span><span class="w"> </span><span class="n">ringSize</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="c1">// ...</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">};</span>
+</code></pre></div>
+<p>The <code>CkMigrateMessage *</code> constructor matters more here than it did in Chapter 2: array
+elements are the migratable unit in Charm++, and the load balancer will move them
+(covered in the load-balancing chapter). It can stay empty for now.</p>
+<hr />
+<h2 id="creating-the-array">Creating the Array<a class="headerlink" href="#creating-the-array" title="Permanent link">&para;</a></h2>
+<p>The whole array is created with one <code>ckNew</code> call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">CProxy_Ring</span><span class="w"> </span><span class="n">ring</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Ring</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">thisProxy</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">);</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">//                                    \_____constructor args_____/  \_count_/</span>
+</code></pre></div>
+<p><strong>The element count is the last argument</strong>, after the constructor arguments. Every element
+is constructed with the same argument values — here, a proxy to the main chare and the ring
+size. The call returns a proxy to the <strong>entire array</strong>, and like every other <code>ckNew</code> it is
+non-blocking: it returns immediately, and the elements are constructed asynchronously on
+whichever PEs the runtime chooses.</p>
+<p>The program does not choose where elements go. With 5 elements on 3 PEs, the assignment is
+the runtime's to make — and once migration enters the picture, it can change during the run.
+A correct Charm++ program never depends on the mapping.</p>
+<hr />
+<h2 id="addressing-an-element">Addressing an Element<a class="headerlink" href="#addressing-an-element" title="Permanent link">&para;</a></h2>
+<p>Applying the index operator to the array proxy produces a proxy to one element:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">ring</span><span class="p">(</span><span class="mi">3</span><span class="p">).</span><span class="n">doSomething</span><span class="p">(...);</span><span class="w">    </span><span class="c1">// invoke on element 3 only</span>
+</code></pre></div>
+<p>The invocation is asynchronous, exactly like an entry method call on a single chare. The
+parameters are packed into a message, the message goes to whichever PE currently holds
+element 3, and control returns immediately.</p>
+<p>Inside an element, <code>thisProxy</code> is a proxy to <strong>its own array</strong>, so a sibling is addressed
+the same way:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">thisProxy</span><span class="p">(</span><span class="n">nextIndex</span><span class="p">).</span><span class="n">doSomething</span><span class="p">(...);</span>
+</code></pre></div>
+<p>and <code>thisIndex</code> is the element's own index — a plain <code>int</code> for a <code>[1D]</code> array:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">nextI</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ringSize</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><code>ring[3]</code> and <code>ring(3)</code> are equivalent for a 1D array. This tutorial uses parentheses
+throughout, because they extend directly to <code>grid(i, j)</code> for a two-dimensional array,
+where the bracket form needs an explicit index object.</p>
+<hr />
+<h2 id="a-complete-program-the-ring">A Complete Program: The Ring<a class="headerlink" href="#a-complete-program-the-ring" title="Permanent link">&para;</a></h2>
+<p>The ring program passes a single token around a chare array. Element <code>i</code> sends to element
+<code>i+1</code>, wrapping at the end, for a given number of trips around the ring. The token carries
+everything needed to continue: how many elements are left in this trip, how many trips
+remain, and — purely so the output can be read — where it came from.</p>
+<p>The interface file declares one main chare and one array:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// ring.ci</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">mainmodule</span><span class="w"> </span><span class="n">ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">mainchare</span><span class="w"> </span><span class="n">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">);</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringFinished</span><span class="p">();</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ringSize</span><span class="p">);</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">doSomething</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromPE</span><span class="p">);</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="p">};</span>
+</code></pre></div>
+<p>The main chare creates the array and starts the token at a random element:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// ring.C</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="n">Main</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ringSize</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">tripCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Ring: size=%d trips=%d PEs=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">,</span><span class="w"> </span><span class="n">tripCount</span><span class="p">,</span><span class="w"> </span><span class="n">CkNumPes</span><span class="p">());</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="n">CProxy_Ring</span><span class="w"> </span><span class="n">ring</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Ring</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">thisProxy</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">);</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">));</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="n">ring</span><span class="p">(</span><span class="n">rand</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ringSize</span><span class="p">).</span><span class="n">doSomething</span><span class="p">(</span><span class="n">ringSize</span><span class="p">,</span><span class="w"> </span><span class="n">tripCount</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">);</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">ringFinished</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CkExit</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="p">};</span>
+</code></pre></div>
+<p>Starting at a random element is not decoration. No element of a chare array is privileged,
+and the program works the same wherever the token starts.</p>
+<p>Each element, on receiving the token, prints a line and passes it on:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Ring</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">ringSize</span><span class="p">;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="n">Ring</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="n">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">(</span><span class="n">mp</span><span class="p">),</span><span class="w"> </span><span class="n">ringSize</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">nextI</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ringSize</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">doSomething</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromPE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Ring[%d](%d): tripsLeft=%d from [%d](%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">             </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">CkMyPe</span><span class="p">(),</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="n">fromPE</span><span class="p">);</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">elementsLeft</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">      </span><span class="n">thisProxy</span><span class="p">(</span><span class="n">nextI</span><span class="p">()).</span><span class="n">doSomething</span><span class="p">(</span><span class="n">elementsLeft</span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">CkMyPe</span><span class="p">());</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tripsLeft</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="n">thisProxy</span><span class="p">(</span><span class="n">nextI</span><span class="p">()).</span><span class="n">doSomething</span><span class="p">(</span><span class="n">ringSize</span><span class="p">,</span><span class="w"> </span><span class="n">tripsLeft</span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">CkMyPe</span><span class="p">());</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">      </span><span class="n">mainProxy</span><span class="p">.</span><span class="n">ringFinished</span><span class="p">();</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="p">};</span>
+</code></pre></div>
+<p>Three cases: elements remain in this trip, so pass the token on; the trip is finished but
+more trips remain, so start a new one; or everything is done, so tell the main chare, which
+exits. The element does not need to know how far along the ring the token is — that state
+travels in the message.</p>
+<h3 id="build-and-run">Build and run<a class="headerlink" href="#build-and-run" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">cd</span><span class="w"> </span>examples/ring
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>make
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>+p3<span class="w"> </span>./ring<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Ring: size=5 trips=2 PEs=3
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Ring[4](2): tripsLeft=2 from [-1](-1)
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Ring[0](0): tripsLeft=2 from [4](2)
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Ring[1](0): tripsLeft=2 from [0](0)
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>Ring[2](1): tripsLeft=2 from [1](0)
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>Ring[3](1): tripsLeft=2 from [2](1)
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>Ring[4](2): tripsLeft=1 from [3](1)
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Ring[0](0): tripsLeft=1 from [4](2)
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>...
+</code></pre></div>
+<p>Each line reads <code>Ring[element](PE)</code>. The token started at element 4 (the <code>from [-1](-1)</code>
+line) and walked 4 → 0 → 1 → 2 → 3, twice. Five elements on three PEs came out as
+0,1 → PE 0; 2,3 → PE 1; 4 → PE 2. Nothing in the program asked for that distribution, and
+running with <code>+p2</code> or <code>+p4</code> will produce a different one.</p>
+<hr />
+<h2 id="several-rings-at-once">Several Rings at Once<a class="headerlink" href="#several-rings-at-once" title="Permanent link">&para;</a></h2>
+<p>Nothing restricts a program to one chare array. A program may create as many as it likes,
+including several of the same chare class, of different sizes, all running at the same time.</p>
+<p>The <code>multiring</code> program does exactly that. The change to the main chare is a loop:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Create the rings. Each is a separate chare array; they never interact.</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numRings</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="n">CProxy_Ring</span><span class="w"> </span><span class="n">ring</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Ring</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">thisProxy</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ringSize</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="n">ring</span><span class="p">(</span><span class="n">rand</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ringSize</span><span class="p">[</span><span class="n">i</span><span class="p">]).</span><span class="n">doSomething</span><span class="p">(</span><span class="n">ringSize</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">tripCount</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">);</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>Each <code>ckNew</code> produces a <strong>new array</strong> with its own elements and its own proxy. The arrays
+are independent: they have different sizes, run different numbers of trips, and never
+exchange a message. The runtime places and schedules all of their elements together.</p>
+<p>Two details follow from this.</p>
+<p><strong>Elements need an ID if they must know which collection they belong to.</strong> An element can
+ask for <code>thisIndex</code>, but there is no "which array am I in?" query — the proxy identifies the
+array, not the element. So the ring ID is passed to the constructor and stored:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rID</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">(</span><span class="n">mp</span><span class="p">),</span><span class="w"> </span><span class="n">ringSize</span><span class="p">(</span><span class="n">rs</span><span class="p">),</span><span class="w"> </span><span class="n">ringID</span><span class="p">(</span><span class="n">rID</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+</code></pre></div>
+<p><strong>Completion is counted per collection.</strong> The main chare now waits for <em>n</em> rings rather
+than one:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">ringFinished</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">finishedCount</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">numRings</span><span class="p">)</span><span class="w"> </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>finishedCount</code> is a member variable of the main chare. It is tempting to write
+<code>static int finishedCount</code> inside the method instead, and it would even work here — but a
+function-local <code>static</code> is per-process state, not per-chare state, and it is wrong the
+moment a chare class has more than one instance or migrates. Keep per-chare state in
+members.</p>
+<hr />
+<h2 id="letting-the-sender-choose-the-receiver">Letting the Sender Choose the Receiver<a class="headerlink" href="#letting-the-sender-choose-the-receiver" title="Permanent link">&para;</a></h2>
+<p>In the single ring, each element sends to <code>thisIndex + 1</code>. The multiple-ring version skips
+a random number of elements instead:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">nextI</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ringSize</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">elementsLeft</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">skipAmount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">rand</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="n">thisProxy</span><span class="p">(</span><span class="n">nextI</span><span class="p">(</span><span class="n">skipAmount</span><span class="p">))</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">      </span><span class="p">.</span><span class="n">doSomething</span><span class="p">(</span><span class="n">elementsLeft</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">skipAmount</span><span class="p">,</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">CkMyPe</span><span class="p">());</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>The skip is a stand-in for non-uniform work, but it also makes a point about the
+programming model. The target index is an ordinary run-time expression: the sender decides,
+at the moment of sending, which element receives the message. The receiving element does
+nothing to prepare, and it does not know a message is coming.</p>
+<p>This is one of the clearest differences from two-sided message passing. In MPI the
+receiving process must post a matching <code>recv</code>, so it has to know that a message is on the
+way and from whom. Here the destination is computed from a random number on the sender's
+side, and no corresponding call exists on the receiver. Any pattern where "one or more
+elements may or may not receive a message, depending on a condition known only to the
+sender" is written the same direct way.</p>
+<p>An element may also send to itself: <code>thisProxy(thisIndex)</code> is a legal target, and the
+message goes through the scheduler like any other.</p>
+<hr />
+<h2 id="splitting-the-program-across-modules">Splitting the Program Across Modules<a class="headerlink" href="#splitting-the-program-across-modules" title="Permanent link">&para;</a></h2>
+<p>Both chare classes in <code>multiring</code> could live in one <code>.ci</code> file, as they do in <code>ring</code>. The
+program splits them instead, because real applications outgrow a single file, and because
+a library is delivered as a module that an application includes.</p>
+<p>A program has exactly <strong>one</strong> <code>mainmodule</code>, and may have any number of additional modules,
+conventionally one per <code>.ci</code> file. A module that refers to another module's types declares
+<code>extern module</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">// multiRing_Main.ci</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">mainmodule</span><span class="w"> </span><span class="n">multiRing_Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="n">mainchare</span><span class="w"> </span><span class="n">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">);</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringFinished</span><span class="p">();</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="c1">// Include the Ring module</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="k">extern</span><span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="n">multiRing_Ring</span><span class="p">;</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="p">};</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// multiRing_Ring.ci</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="k">module</span><span class="w"> </span><span class="n">multiRing_Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="c1">// Include the Main module (for the CProxy_Main parameter below)</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="k">extern</span><span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="n">multiRing_Main</span><span class="p">;</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Ring</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mp</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rs</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">rID</span><span class="p">);</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">doSomething</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromPE</span><span class="p">);</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="p">};</span>
+</code></pre></div>
+<p>The dependency runs both ways here: <code>Main</code> creates <code>Ring</code> elements, and <code>Ring</code>'s
+constructor takes a <code>CProxy_Main</code>. Each module declares the other as <code>extern</code>.</p>
+<p>Each <code>.C</code> file then includes <strong>its own</strong> module's generated headers — <code>.decl.h</code> at the top,
+<code>.def.h</code> at the bottom — exactly once across the whole program:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// multiRing_Main.C</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;multiRing_Main.decl.h&quot;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Main</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;multiRing_Main.def.h&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// multiRing_Ring.C</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;multiRing_Ring.decl.h&quot;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Ring</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Ring</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;multiRing_Ring.def.h&quot;</span>
+</code></pre></div>
+<p>The Makefile compiles each <code>.ci</code> and each <code>.C</code>, then links both objects:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">OBJS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>multiRing_Main.o<span class="w"> </span>multiRing_Ring.o
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nf">multiRing</span><span class="o">:</span><span class="w"> </span><span class="k">$(</span><span class="nv">OBJS</span><span class="k">)</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="k">$(</span>CHARMC<span class="k">)</span><span class="w"> </span>-language<span class="w"> </span>charm++<span class="w"> </span>-o<span class="w"> </span>multiRing<span class="w"> </span><span class="k">$(</span>OBJS<span class="k">)</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="nf">multiRing_Main.decl.h</span><span class="o">:</span><span class="w"> </span><span class="n">multiRing_Main</span>.<span class="n">ci</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="k">$(</span>CHARMC<span class="k">)</span><span class="w"> </span>multiRing_Main.ci
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="nf">multiRing_Ring.decl.h</span><span class="o">:</span><span class="w"> </span><span class="n">multiRing_Ring</span>.<span class="n">ci</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="k">$(</span>CHARMC<span class="k">)</span><span class="w"> </span>multiRing_Ring.ci
+</code></pre></div>
+<p>Run it with a ring size and trip count per ring:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nb">cd</span><span class="w"> </span>examples/multiring
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>make
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>+p3<span class="w"> </span>./multiRing<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>That is three rings — 5 elements for 3 trips, 10 elements for 1 trip, 8 elements for 2
+trips — all in flight at once.</p>
+<hr />
+<h2 id="reading-the-output">Reading the Output<a class="headerlink" href="#reading-the-output" title="Permanent link">&para;</a></h2>
+<p>The output of that run is confusing on first sight, and the confusion is the lesson:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Ring 0[0](0): tripsLeft = 3, from [-1](-1)
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>Ring 1[2](0): tripsLeft = 1, from [-1](-1)
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>Ring 0[0](0): tripsLeft = 3, from [0](0)
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>Ring 1[3](0): tripsLeft = 1, from [2](0)
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>Ring 2[7](2): tripsLeft = 2, from [-1](-1)
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>Ring 0[1](0): tripsLeft = 2, from [0](0)
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>...
+</code></pre></div>
+<p>Three rings are interleaved, and on a larger run the header printed by the main chare —
+before any array element existed — can appear in the middle of the output, after lines from
+elements it created.</p>
+<p><code>CkPrintf</code> output is itself delivered by message. The text is packed up and sent to the
+process doing the printing, and those messages are subject to the same absence of ordering
+guarantees as everything else. Print order is not program order, and on a busy run it is
+not even close.</p>
+<p>Two working rules follow:</p>
+<ul>
+<li><strong>Never infer event ordering from print order.</strong> If you need to know that A happened
+  before B, the program must establish that, not the log.</li>
+<li><strong>Put identity in every line.</strong> <code>Ring %d[%d](%d) ... from [%d](%d)</code> records which
+  collection, which element, which PE, and where the message came from. That is what makes
+  the log sortable after the fact: group by ring, and each ring's traversal reads back in
+  order even though the lines were interleaved on screen.</li>
+</ul>
+<hr />
+<h2 id="other-kinds-of-index">Other Kinds of Index<a class="headerlink" href="#other-kinds-of-index" title="Permanent link">&para;</a></h2>
+<p>Everything above used a dense, integer-indexed, one-dimensional array. The same collection
+mechanism covers considerably more, and the syntax is a small extension of what you have
+already seen.</p>
+<p><strong>Multidimensional.</strong> Up to six dimensions, declared with the dimensionality and created
+with one extent per dimension:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Tile</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">};</span><span class="w">                      </span><span class="c1">// in the .ci file</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">CProxy_Tile</span><span class="w"> </span><span class="n">grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Tile</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w">  </span><span class="c1">// an m x n array</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">grid</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">).</span><span class="n">startStep</span><span class="p">();</span><span class="w">                       </span><span class="c1">// address one element</span>
+</code></pre></div>
+<p>Inside an element, <code>thisIndex</code> is a struct rather than an <code>int</code> — <code>thisIndex.x</code> and
+<code>thisIndex.y</code> for a 2D array. A later chapter works through a 2D five-point stencil,
+which is where multidimensional indexing earns its keep.</p>
+<p><strong>Sparse.</strong> An array need not be created with a size at all. Start it empty and insert the
+elements that exist:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">CProxy_Compute</span><span class="w"> </span><span class="n">computeArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Compute</span><span class="o">::</span><span class="n">ckNew</span><span class="p">();</span><span class="w">   </span><span class="c1">// no elements yet</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">computeArray</span><span class="p">[</span><span class="n">CkArrayIndex6D</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">)].</span><span class="n">insert</span><span class="p">();</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="c1">// ... insert the rest ...</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">computeArray</span><span class="p">.</span><span class="n">doneInserting</span><span class="p">();</span>
+</code></pre></div>
+<p>This is how a 6D array holding a few thousand elements over an index space of billions is
+built — only the indices that exist are inserted. Note the bracket form with an explicit
+<code>CkArrayIndex6D</code>: that is the general way to address an element, and the <code>grid(i, j)</code> form
+above is shorthand for it.</p>
+<p><strong>Bit vectors and strings.</strong> An index can also be a bit vector or a string, for collections
+whose natural name is not a tuple of integers.</p>
+<p>The chapter on array indices covers these properly. The molecular dynamics mini-application
+<a href="https://github.com/UIUC-PPL/leanmd">LeanMD</a> is worth looking at alongside it: it pairs a
+dense <code>array [3D] Cell</code> of spatial cells with a sparse <code>array [6D] Compute</code>, where a
+Compute element indexed <code>(x1,y1,z1,x2,y2,z2)</code> computes forces between the pair of cells
+<code>(x1,y1,z1)</code> and <code>(x2,y2,z2)</code> — an index space of cells-squared, of which only neighboring
+pairs are ever inserted.</p>
+<hr />
+<h2 id="pitfalls">Pitfalls<a class="headerlink" href="#pitfalls" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>The element count goes last in <code>ckNew</code>.</strong> <code>CProxy_Ring::ckNew(thisProxy, ringSize, ringSize)</code>
+   passes two constructor arguments and then the count. Putting the count first, or omitting
+   it, gives either a compile error or an array of the wrong size.</p>
+</li>
+<li>
+<p><strong>Nothing guarantees where an element lives.</strong> <code>CkMyPe()</code> inside an element tells you
+   where it is right now. Code that depends on a particular element being on a particular PE
+   is wrong even before load balancing is introduced.</p>
+</li>
+<li>
+<p><strong>A function-local <code>static</code> is not per-chare state.</strong> It is per-process. Use member
+   variables for anything an element or the main chare needs to remember.</p>
+</li>
+<li>
+<p><strong>Apostrophes in <code>.ci</code> comments produce a preprocessor warning.</strong> <code>charmc</code> runs the C
+   preprocessor over the interface file, so <code>// the Main object's module</code> yields
+   <code>warning: missing terminating ' character</code>. Harmless, but avoid it.</p>
+</li>
+<li>
+<p><strong>Print order is not program order</strong> — see above. This is the single most common source
+   of imagined bugs in a first Charm++ program.</p>
+</li>
+</ol>
+<hr />
+<h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h2>
+<p><strong>1. Bidirectional ring.</strong> Modify <code>ring</code> so that the token alternates direction: the element
+that receives it on an even trip passes it to <code>thisIndex + 1</code>, and on an odd trip to
+<code>thisIndex - 1</code> (wrapping correctly in both directions). Confirm from the output that the
+traversal really reverses.</p>
+<p><strong>2. Two rings that share elements.</strong> In <code>multiring</code>, all rings are separate arrays. Create
+instead a <em>single</em> array of N elements and run two tokens through it at once — one stepping
+by 1, one stepping by 2 — each with its own trip count, and exit when both have finished.
+What does each element need to know to keep the two tokens apart, and what happens if both
+tokens arrive at the same element at the same time?</p>
+<p><strong>3. Communication granularity.</strong> Create an array <code>A</code> of 2 elements. <code>A[0]</code> is a producer
+and <code>A[1]</code> a consumer. <code>A[0]</code> generates N random doubles in batches of K, sending each batch
+to <code>A[1]</code> with an entry method <code>request</code>; <code>A[1]</code> squares each value and returns the batch
+with <code>response</code>. Take N and K from the command line. Time the whole run for a fixed N and a
+range of K from 1 to 10,000, and explain the shape of the curve — this is the grainsize
+experiment from Chapter 2, now measuring communication rather than computation.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A <strong>chare array</strong> is an indexed collection of chares, declared <code>array [1D] Foo</code> in the
+  <code>.ci</code> file and created in a single <code>ckNew</code> call with the element count <strong>last</strong>.</li>
+<li>Elements are distributed over the PEs by the runtime. The program never chooses, and must
+  never depend on, the placement.</li>
+<li><code>arr(i)</code> addresses element <code>i</code>; inside an element, <code>thisIndex</code> is its own index and
+  <code>thisProxy(j)</code> addresses a sibling. The target index is an ordinary run-time expression,
+  computed by the sender.</li>
+<li>A program may create <strong>any number of arrays</strong>, including several of the same class. They
+  are independent; give elements an ID if they must know which collection they are in.</li>
+<li>A program has one <code>mainmodule</code> and any number of <code>module</code>s, one per <code>.ci</code> file, referring
+  to each other with <code>extern module</code>. Each <code>.C</code> file includes its own <code>.decl.h</code> and
+  <code>.def.h</code>.</li>
+<li><code>CkPrintf</code> output arrives by message, so <strong>print order is not program order</strong>. Put
+  identity in every line.</li>
+</ul>
+<p>Everything here used point-to-point invocations on individual elements. The next chapter adds the
+two collective operations that make a chare array more than a list of chares: <strong>broadcast</strong>,
+which invokes an entry method on every element, and <strong>reduction</strong>, which combines a value
+from every element and delivers the result to one place.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ch2_basic_chares/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 2 — Basic Chares">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 2 — Basic Chares
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../ch4_sdag/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 4 — Structured Dagger">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Chapter 4 — Structured Dagger
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
