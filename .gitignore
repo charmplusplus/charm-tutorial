@@ -39,6 +39,9 @@ summary*/
 *.sum
 *.projrc
 
+# Exercise solutions — kept locally, not published (they are the answers)
+exercise_solutions/
+
 # Session and working files (not for publication)
 prompt_log.md
 notes/

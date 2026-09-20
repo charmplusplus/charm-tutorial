@@ -211,7 +211,8 @@ complete. `insert()` can optionally take a PE number as a placement hint.
 
 Note the bracket form with an explicit `CkArrayIndex6D`. That is the general way to address
 an element of a chare array. The `grid(i, j)` form used throughout this tutorial is
-shorthand for `grid[CkArrayIndex2D(i, j)]`.
+shorthand for `grid[CkArrayIndex2D(i, j)]`, and it works for insertion too —
+`arr(i, j).insert()` and `arr[CkArrayIndex2D(i, j)].insert()` are the same call.
 
 ### Where this matters: LeanMD
 
@@ -285,27 +286,60 @@ table exercise does. They are mentioned here so that the shape of the mechanism 
 
 5. **A strided slice is not contiguous.** Sending a column of a 2D block means copying it
    into a buffer first; the entry-method array parameter packs whatever contiguous range it
-   is given.
+   is given. In three dimensions *no* face interior is contiguous, so every face needs a
+   pack step — the one free direction that 2D gives you does not survive.
+
+6. **Inserting the same index twice aborts — but only in a build with error checking.**
+   The guard is a `CkAssertMsg`, which compiles to nothing when `CMK_ERROR_CHECKING` is off.
+   In a `--with-production` build a duplicate `insert()` is not caught at all. Watch for
+   index sets that overlap, such as a diagonal and a first row meeting at (0,0).
+
+7. **With a fixed boundary, the boundary halo must be right in *both* buffers.** A
+   double-buffered stencil swaps `cur` and `next` every step. Interior ghosts are refilled
+   by neighbours each step, so they take care of themselves — but a boundary ghost that no
+   neighbour ever sends is only as good as what the buffer was initialised with. Setting it
+   in `cur` alone leaves the other buffer's boundary holding whatever `new float[]` returned,
+   and the program still *appears* to work, because fresh pages read as zero and zero is the
+   usual boundary value.
 
 ---
 
 ## Exercises
 
-**1. Non-periodic boundaries.** The stencil wraps at the edges, which makes every tile have
-exactly four neighbors. Change it so the grid has fixed boundaries: edge tiles have three
-neighbors and corner tiles two, with the outer boundary held at a constant value. What does
-`countEvent` have to become, and where does the expected count come from?
+**1. Non-periodic boundaries.** The stencil wraps at the edges, so every tile has exactly
+four neighbours. Change it so the grid has fixed boundaries: edge tiles have three
+neighbours, corner tiles two, and the outer boundary is held at a constant value. Two things
+have to change, and the second one is the interesting one.
 
-**2. Three dimensions.** Extend the stencil to a 3D grid with a seven-point stencil —
-`array [3D]`, six neighbors, six ghost faces per step. A face of a 3D block is strided in
-two ways rather than one; how much of the tile code has to change, and how much of the main
-chare?
+First, `countEvent` can no longer compare against a hard-coded 5. Where does the expected
+count come from, and when can it be computed?
+
+Second — and this is the part worth doing carefully — the boundary ghost cells are now never
+refilled by a neighbour, while `cur` and `next` are swapped every step. Get this wrong and
+the program will still run and still look like it converges. Before you trust it, fill the
+unused buffer with an obviously wrong value (`99.0f` everywhere) at construction and run it
+again. If the output changes, the program was reading memory it never wrote.
+
+**2. Three dimensions.** Extend the stencil to a 3D grid with a seven-point stencil:
+`array [3D]`, six neighbours, six ghost faces per step. Before writing it, work out for each
+of the six faces whether its interior values are contiguous in a flat `(t+2)³` array. The
+answer determines how much of the 2D code carries over — in two dimensions, rows were
+contiguous and could be sent straight out of the array, and only columns had to be copied.
+Does either of those cases survive in 3D?
+
+You will also need a buffer to pack faces into. Is one buffer enough for all six sends in
+the same entry method, or does each send need its own? What property of entry-method
+invocation decides that?
 
 **3. A sparse array of your own.** Create a 2D chare array in which only the elements on the
 diagonal and the first row exist, using `ckNew()`, `insert()` and `doneInserting()`. Have
 each element print its index and PE. Confirm that a broadcast reaches exactly the elements
 you inserted, and that a reduction over the array completes with only those elements
 contributing.
+
+Write the two insertion loops the obvious way first, without thinking about where they
+overlap, and run it. Then look up what the runtime told you, and check whether that
+diagnostic would still be there in a production build.
 
 ---
 
