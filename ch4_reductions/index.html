@@ -1,0 +1,1378 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch4_reductions/">
+      
+      
+        <link rel="prev" href="../ch3_chare_arrays/">
+      
+      
+        <link rel="next" href="../ch5_array_indices/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 4 — Reductions and Broadcasts - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-4-reductions-and-broadcasts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 4 — Reductions and Broadcasts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch1_introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch2_basic_chares/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch3_chare_arrays/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Chare Arrays
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — Reductions and Broadcasts
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — Reductions and Broadcasts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#broadcast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Broadcast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#readonly-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Readonly Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-reduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Reduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A Reduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-runtime-actually-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the runtime actually does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-reducers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in reducers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-reductions-in-flight" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Reductions in Flight
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-reductions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Reductions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#putting-it-together-k-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Putting It Together: K-means
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_array_indices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Array Indices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch7_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 7 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch8_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 8 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch9_threaded/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 9 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#broadcast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Broadcast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#readonly-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Readonly Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-reduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Reduction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A Reduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-the-runtime-actually-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the runtime actually does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-reducers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in reducers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-reductions-in-flight" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple Reductions in Flight
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vector-reductions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vector Reductions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#putting-it-together-k-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Putting It Together: K-means
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-4-reductions-and-broadcasts">Chapter 4: Reductions and Broadcasts<a class="headerlink" href="#chapter-4-reductions-and-broadcasts" title="Permanent link">&para;</a></h1>
+<p>Chapter 3 addressed one element at a time. <code>arr(i).method()</code> sends a message to element <code>i</code>,
+and that is enough to build a ring, a neighbor exchange, or any other point-to-point pattern.</p>
+<p>Two operations involve the collection as a whole:</p>
+<ul>
+<li>A <strong>broadcast</strong> invokes an entry method on <em>every</em> element of an array.</li>
+<li>A <strong>reduction</strong> combines a value from <em>every</em> element into a single result, delivered to
+  one place.</li>
+</ul>
+<p>They are duals, and most iterative programs alternate between them: broadcast the current
+state to everyone, let them compute, reduce the results back, decide what to do next.</p>
+<hr />
+<h2 id="broadcast">Broadcast<a class="headerlink" href="#broadcast" title="Permanent link">&para;</a></h2>
+<p>A broadcast is an entry method invocation on the array proxy with <strong>no index</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">pointsArray</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">centroids</span><span class="p">);</span><span class="w">   </span><span class="c1">// runs on every element</span>
+</code></pre></div>
+<p>Compare with <code>pointsArray(3).assign(...)</code>, which runs on element 3 only. Dropping the index
+is the entire difference in syntax.</p>
+<p>The semantics are what you would expect from Chapter 2, applied to every element at once:</p>
+<ul>
+<li>It is <strong>asynchronous</strong>. The call returns immediately; the elements run <code>assign</code> later.</li>
+<li>The elements run it <strong>independently and in no particular order</strong>, on whatever PEs they
+  occupy. Two elements may be executing it at the same moment.</li>
+<li>There is <strong>no completion signal</strong>. The broadcast tells you nothing about when the
+  elements finish, or whether they have started.</li>
+</ul>
+<p>That last point is why broadcasts and reductions travel together. The broadcast pushes work
+out; the reduction is how the program learns it is done.</p>
+<hr />
+<h2 id="readonly-variables">Readonly Variables<a class="headerlink" href="#readonly-variables" title="Permanent link">&para;</a></h2>
+<p>Before the reduction itself, a small piece of machinery that every non-trivial program uses.</p>
+<p>Array elements usually need configuration values: the problem size, a convergence
+threshold, a proxy to the main chare so they can send results back. Chapter 3 passed these
+through the constructor — <code>Ring(CProxy_Main mp, int rs, int rID)</code> — which works, but does
+not scale. Values needed by every chare in the program end up threaded through every
+constructor and stored in every element.</p>
+<p>A <strong>readonly</strong> variable is declared in the <code>.ci</code> file and defined as a global in the <code>.C</code>
+file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// kmeans.ci</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">readonly</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">K</span><span class="p">;</span><span class="w">                   </span><span class="c1">// number of clusters</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">readonly</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numPoints</span><span class="p">;</span><span class="w">           </span><span class="c1">// total points M</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">readonly</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numChares</span><span class="p">;</span><span class="w">           </span><span class="c1">// number of Points chares N</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">readonly</span><span class="w"> </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span><span class="w">   </span><span class="c1">// so Points can address Main for reductions</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// kmeans.C</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">K</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numPoints</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numChares</span><span class="p">;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span>
+</code></pre></div>
+<p>The <code>/*readonly*/</code> comment is convention, not syntax — it marks the definitions for a human
+reader. The main chare assigns them in its constructor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">numPoints</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">numChares</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">K</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">mainProxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thisProxy</span><span class="p">;</span>
+</code></pre></div>
+<p>The runtime then propagates them to every PE <strong>before any other entry method runs anywhere</strong>
+in the program. That guarantee is what makes them usable: an element constructed later, on
+any PE, can read them without asking anyone.</p>
+<p>The effect on the element is visible in its constructor, which now takes no arguments at all:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Points</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numPoints</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">numChares</span><span class="p">;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="n">myNumPoints</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numChares</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">numPoints</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">numChares</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="c1">// ...</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>Each element works out its own share of the data from the readonly values and its own
+<code>thisIndex</code>. Nothing had to be sent to it.</p>
+<p>Two rules come with the mechanism. Assign readonly variables <strong>only in the main chare
+constructor</strong> — they are read-only everywhere else, and for the whole run after that. And
+note that this is not a license for global variables generally: a mutable global in a
+Charm++ program is not legal, because chares on the same PE would share it and chares on
+different PEs would not, which is never the behavior anyone wants.</p>
+<hr />
+<h2 id="a-reduction">A Reduction<a class="headerlink" href="#a-reduction" title="Permanent link">&para;</a></h2>
+<p><code>examples/reduction</code> is the smallest program that does one. Each element of an array
+contributes its own index, and the sum arrives at the main chare:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// reduction.ci</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">mainmodule</span><span class="w"> </span><span class="n">reduction</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">mainchare</span><span class="w"> </span><span class="n">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">);</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">reductiontarget</span><span class="p">]</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">printResult</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Elem</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Elem</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">};</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// reduction.C</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">numElems</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">m</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;reduction: %d elements, expected sum = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">             </span><span class="n">numElems</span><span class="p">,</span><span class="w"> </span><span class="n">numElems</span><span class="o">*</span><span class="p">(</span><span class="n">numElems</span><span class="mi">-1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="n">CProxy_Elem</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">thisProxy</span><span class="p">,</span><span class="w"> </span><span class="n">numElems</span><span class="p">);</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">printResult</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;result = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="p">};</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">class</span><span class="w"> </span><span class="nc">Elem</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Elem</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="n">Elem</span><span class="p">(</span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">;</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="n">CkCallback</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">printResult</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="n">contribute</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_int</span><span class="p">,</span><span class="w"> </span><span class="n">cb</span><span class="p">);</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="p">};</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$ ./charmrun ++local +p3 ./reduction 8
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>reduction: 8 elements, expected sum = 28
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>result = 28
+</code></pre></div>
+<p>Three pieces make that work.</p>
+<p><strong><code>contribute</code></strong> is called by each element. Its arguments are the size of the contribution
+<strong>in bytes</strong>, a pointer to the data, the reducer to combine with, and a callback saying
+where the result goes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">contribute</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_int</span><span class="p">,</span><span class="w"> </span><span class="n">cb</span><span class="p">);</span>
+</code></pre></div>
+<p><strong><code>[reductiontarget]</code></strong> marks the receiving entry method in the <code>.ci</code> file. A reduction
+target receives the combined value as an ordinary typed argument — <code>void printResult(int
+result)</code> — with no message to unpack.</p>
+<p><strong><code>CkReductionTarget</code></strong> builds the callback that names it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">CkCallback</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">printResult</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+</code></pre></div>
+<p><code>CkReductionTarget(Class, method)</code> identifies the entry method, and the proxy says which
+chare to deliver to.</p>
+<h3 id="what-the-runtime-actually-does">What the runtime actually does<a class="headerlink" href="#what-the-runtime-actually-does" title="Permanent link">&para;</a></h3>
+<p>The reduction is <strong>not</strong> a gather. The runtime combines contributions up a spanning tree
+across the PEs: each PE combines the contributions of the elements it holds, then combines
+with its children in the tree, and only one value per PE climbs to the next level. The cost
+is logarithmic in the number of processors, and no single chare ever receives <em>n</em> messages.</p>
+<p>Two consequences follow from the tree:</p>
+<ul>
+<li><strong>The combining order is unspecified.</strong> The reduction operation must be associative and
+  commutative, or the answer depends on element placement and the number of PEs.</li>
+<li><strong>Every element must contribute.</strong> The reduction completes when all of them have. If one
+  element does not call <code>contribute</code>, nothing happens — no error, no timeout, just a program
+  that never finishes. An element with nothing to add must still contribute an identity
+  value.</li>
+</ul>
+<p>Compare this with the counting pattern from Chapter 2, where each of K chares sent a result
+back to the main chare, which decremented a counter and combined the values itself. That is
+K messages arriving at one chare and a serial combine. The reduction replaces it with a
+tree, and replaces the counter with the runtime's own completion detection.</p>
+<h3 id="built-in-reducers">Built-in reducers<a class="headerlink" href="#built-in-reducers" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Reducer</th>
+<th>Combines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CkReduction::sum_int</code>, <code>sum_long</code>, <code>sum_float</code>, <code>sum_double</code></td>
+<td>sum</td>
+</tr>
+<tr>
+<td><code>CkReduction::product_int</code>, <code>product_double</code>, …</td>
+<td>product</td>
+</tr>
+<tr>
+<td><code>CkReduction::max_int</code>, <code>max_float</code>, <code>max_double</code>, …</td>
+<td>maximum</td>
+</tr>
+<tr>
+<td><code>CkReduction::min_int</code>, <code>min_float</code>, <code>min_double</code>, …</td>
+<td>minimum</td>
+</tr>
+<tr>
+<td><code>CkReduction::logical_and</code>, <code>logical_or</code></td>
+<td>logical combine</td>
+</tr>
+<tr>
+<td><code>CkReduction::nop</code></td>
+<td>nothing — the reduction is used purely as a completion signal</td>
+</tr>
+</tbody>
+</table>
+<p><code>CkReduction::nop</code> deserves a note: a reduction with no data still tells the target that
+every element has reached that point. That is the standard way to detect that a phase is
+complete.</p>
+<hr />
+<h2 id="multiple-reductions-in-flight">Multiple Reductions in Flight<a class="headerlink" href="#multiple-reductions-in-flight" title="Permanent link">&para;</a></h2>
+<p>A program is not limited to one reduction at a time. <code>examples/ring_reduction</code> adds a
+reduction to the ring from Chapter 3: every element contributes <code>tripsLeft</code> each time the
+token passes through it, so one reduction completes per trip around the ring.</p>
+<p>The only change to the element is three lines:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">doSomething</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">elementsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">fromPE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Ring[%d](%d): tripsLeft=%d from [%d](%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">           </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">CkMyPe</span><span class="p">(),</span><span class="w"> </span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="n">fromIndex</span><span class="p">,</span><span class="w"> </span><span class="n">fromPE</span><span class="p">);</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="c1">// Each element contributes tripsLeft into this trip&#39;s sum reduction</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="n">CkCallback</span><span class="w"> </span><span class="n">cb</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">reductionDone</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="n">contribute</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">tripsLeft</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_int</span><span class="p">,</span><span class="w"> </span><span class="n">cb</span><span class="p">);</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="c1">// ... pass the token on, exactly as before ...</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>and the main chare counts the completions instead of exiting on the first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">reductionDone</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sum</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Reduction result: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">);</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">reductionsDone</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">tripCount</span><span class="p">)</span><span class="w"> </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>$ ./charmrun ++local +p3 ./ring_reduction 5 2
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Ring+Reduction: size=5 trips=2 PEs=3
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Ring[2](1): tripsLeft=2 from [-1](-1)
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>Ring[3](1): tripsLeft=2 from [2](1)
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Ring[4](2): tripsLeft=2 from [3](1)
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Ring[0](0): tripsLeft=2 from [4](2)
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Ring[1](0): tripsLeft=2 from [0](0)
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>Reduction result: 10
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>Ring[2](1): tripsLeft=1 from [1](0)
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>...
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>Reduction result: 5
+</code></pre></div>
+<p>Five elements contributing <code>tripsLeft = 2</code> sum to 10, then five contributing 1 sum to 5.</p>
+<p>The interesting part is what the runtime had to do. Contributions to the first reduction and
+to the second are in flight at the same time — element 2 has already contributed to the
+second trip's reduction while element 1 is still working on the first. The runtime keeps
+them apart by <strong>contribution order</strong>: the <em>n</em>th <code>contribute</code> from every element belongs to
+the <em>n</em>th reduction. Nothing in the message says which reduction it is for.</p>
+<p>That gives the rule for using several reductions: <strong>every element must take part in every
+reduction, in the same order.</strong> An element that skips one, or performs two in the opposite
+order from its siblings, silently corrupts the results — its contribution is combined into
+the wrong reduction.</p>
+<hr />
+<h2 id="vector-reductions">Vector Reductions<a class="headerlink" href="#vector-reductions" title="Permanent link">&para;</a></h2>
+<p>A contribution does not have to be a single value. An element can contribute an array, and
+the reducer combines elementwise:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">CkCallback</span><span class="w"> </span><span class="nf">cbCounts</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">updateCounts</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">contribute</span><span class="p">(</span><span class="n">localK</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="n">localCounts</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_int</span><span class="p">,</span><span class="w"> </span><span class="n">cbCounts</span><span class="p">);</span>
+</code></pre></div>
+<p>The target receives the length and a pointer, declared in the <code>.ci</code> file with the same
+array-parameter syntax as Chapter 2:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">reductiontarget</span><span class="p">]</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">updateCounts</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">counts</span><span class="p">[</span><span class="n">n</span><span class="p">]);</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">updateCounts</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">incoming</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="n">memcpy</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span><span class="w"> </span><span class="n">incoming</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="c1">// ...</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>sum_int</code> over a vector of length <em>k</em> produces a vector of length <em>k</em>, each position summed
+independently across all elements. This is how a program reduces a histogram, a per-category
+total, or any other fixed-size collection of values in one operation rather than <em>k</em>.</p>
+<hr />
+<h2 id="putting-it-together-k-means">Putting It Together: K-means<a class="headerlink" href="#putting-it-together-k-means" title="Permanent link">&para;</a></h2>
+<p><code>examples/kmeans</code> uses all of it. M points are spread over N chares; the main chare holds K
+cluster centroids and improves them by iteration.</p>
+<p>Each round is one broadcast and two reductions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Main: start a round by sending the current centroids to everyone</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">pointsArray</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">centroids</span><span class="p">);</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// Points::assign — classify my own points against the broadcast centroids</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">K2</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">centroids</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">localK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">K2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="kt">int</span><span class="w">    </span><span class="o">*</span><span class="n">localCounts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="p">[</span><span class="n">localK</span><span class="p">]();</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">localCoords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">double</span><span class="p">[</span><span class="n">K2</span><span class="p">]();</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">myNumPoints</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="c1">// ... find the nearest centroid to point i ...</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="n">localCounts</span><span class="p">[</span><span class="n">best</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">    </span><span class="n">localCoords</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">best</span><span class="p">]</span><span class="w">   </span><span class="o">+=</span><span class="w"> </span><span class="n">px</span><span class="p">;</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">    </span><span class="n">localCoords</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">best</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">py</span><span class="p">;</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">  </span><span class="n">CkCallback</span><span class="w"> </span><span class="n">cbCounts</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">updateCounts</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">  </span><span class="n">contribute</span><span class="p">(</span><span class="n">localK</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="n">localCounts</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_int</span><span class="p">,</span><span class="w"> </span><span class="n">cbCounts</span><span class="p">);</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="w">  </span><span class="n">CkCallback</span><span class="w"> </span><span class="n">cbCoords</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">updateCoords</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="w">  </span><span class="n">contribute</span><span class="p">(</span><span class="n">K2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">localCoords</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">sum_double</span><span class="p">,</span><span class="w"> </span><span class="n">cbCoords</span><span class="p">);</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="p">}</span>
+</code></pre></div>
+<p>Each element reports how many of its points fell into each cluster, and the sum of their
+coordinates. Summed across all elements, those two vectors are exactly what is needed to
+place the new centroids: total coordinates divided by total count, per cluster.</p>
+<p>The two reductions complete independently, in no guaranteed order, so the main chare counts
+them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">updateCounts</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">incoming</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="n">memcpy</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span><span class="w"> </span><span class="n">incoming</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">reductionsReceived</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">recomputeCentroids</span><span class="p">();</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">}</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="kt">void</span><span class="w"> </span><span class="nf">updateCoords</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">incoming</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="n">memcpy</span><span class="p">(</span><span class="n">coordSums</span><span class="p">,</span><span class="w"> </span><span class="n">incoming</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">reductionsReceived</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">recomputeCentroids</span><span class="p">();</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>recomputeCentroids</code> divides, measures how far the centroids moved, and either exits or
+broadcasts the new centroids to start another round:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxChange</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">THRESHOLD</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="c1">// ... print the centroids ...</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="n">pointsArray</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">,</span><span class="w"> </span><span class="n">centroids</span><span class="p">);</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>$ ./charmrun ++local +p4 ./kmeans 10000 8 4
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>K-means: M=10000 N=8 K=4 PEs=4
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>Iteration 1: maxChange=0.213005
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>Iteration 2: maxChange=0.050871
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>...
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>Iteration 10: maxChange=0.000718
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>Converged after 10 iterations. Centroids:
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>  cluster 0: (0.2475, 0.7528) count=2549
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>  cluster 1: (0.7462, 0.2570) count=2554
+</code></pre></div>
+<p>This is the <strong>iterate-to-convergence</strong> pattern, and it is worth naming because so many
+parallel programs have this shape:</p>
+<ol>
+<li>The main chare broadcasts the current global state.</li>
+<li>Every element computes on its own data and contributes a summary.</li>
+<li>A reduction delivers the combined summary to one place.</li>
+<li>That one place tests the termination condition and either stops or starts another round.</li>
+</ol>
+<p>The termination test happens in exactly one place, on a value that is already global. No
+element decides for itself whether the computation is finished, and no element needs to see
+any other element's data.</p>
+<hr />
+<h2 id="pitfalls">Pitfalls<a class="headerlink" href="#pitfalls" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>A missing contributor hangs the program silently.</strong> Every element must call
+   <code>contribute</code>, including elements with nothing to say. There is no error message — the
+   reduction simply never completes.</p>
+</li>
+<li>
+<p><strong><code>contribute</code> takes a byte count.</strong> <code>contribute(sizeof(int), &amp;v, ...)</code>, and
+   <code>contribute(k * sizeof(int), vec, ...)</code> for a vector. Passing a count of elements
+   corrupts the reduction.</p>
+</li>
+<li>
+<p><strong>Reductions are matched by order, not by name.</strong> If different elements perform their
+   reductions in different orders, contributions land in the wrong reduction. The results
+   will be wrong without any warning.</p>
+</li>
+<li>
+<p><strong>The reducer must be associative and commutative.</strong> The spanning tree combines in an
+   unspecified order that depends on placement and PE count.</p>
+</li>
+<li>
+<p><strong>A broadcast tells you nothing about completion.</strong> If the program needs to know that
+   every element has finished the broadcast work, the elements must contribute to a
+   reduction — <code>CkReduction::nop</code> if there is no data to combine.</p>
+</li>
+<li>
+<p><strong>Assign readonly variables only in the main chare constructor.</strong> Writing to one later
+   changes it on that PE alone, which is a data-dependent bug of the worst kind.</p>
+</li>
+</ol>
+<hr />
+<h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h2>
+<p><strong>1. Mean and variance in one pass.</strong> Give each element of a 1D array a vector of random
+doubles. Compute the mean and the variance of all the values across the whole array using
+reductions, in a single round — no second broadcast. (Hint: variance needs Σx and Σx², and
+one vector reduction can carry both, along with the count.)</p>
+<p><strong>2. Maximum and where it is.</strong> Find the largest value held by any element, <em>and</em> the index
+of the element holding it. Try it first with <code>CkReduction::max_double</code> alone and see what
+goes wrong: the maximum arrives without any indication of where it came from, and there is
+no built-in reducer that carries an index along with a value. Solve it with the concepts you
+have — reduce the maximum, broadcast it, and have the element that matches report itself.
+What happens if two elements hold the same maximum, and how would you make the answer
+deterministic?</p>
+<p><strong>3. Rewrite the primes program.</strong> Chapter 2's primality program counted completions in the
+main chare with a callback per chare. Rewrite it so the chares form an array and report
+their count of primes found through a single reduction. Compare the two versions for the
+amount of bookkeeping code in the main chare.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A <strong>broadcast</strong> is an entry method invocation on the array proxy with no index. It reaches
+  every element, asynchronously, in no particular order, and reports nothing about
+  completion.</li>
+<li><strong>Readonly variables</strong> are declared in the <code>.ci</code>, defined as globals in the <code>.C</code>, and
+  assigned in the main chare constructor. The runtime makes them available on every PE
+  before any other entry method runs, so elements can read configuration without being told.</li>
+<li>A <strong>reduction</strong> combines a value from every element up a spanning tree and delivers the
+  result to a <code>[reductiontarget]</code> entry method named by <code>CkReductionTarget</code>. Every element
+  must contribute; the combine must be associative and commutative.</li>
+<li>Contributions are <strong>matched by order</strong>, so several reductions can be in flight at once as
+  long as every element performs them in the same sequence.</li>
+<li>A contribution may be a <strong>vector</strong>; the reducer combines elementwise and the target
+  receives <code>(int n, T data[n])</code>.</li>
+<li>The <strong>iterate-to-convergence</strong> pattern — broadcast, compute, reduce, test, repeat — covers
+  a large fraction of real parallel applications.</li>
+</ul>
+<p>Chapters 3 and 4 have built everything out of entry methods that return immediately, with
+each chare's logic spread across the methods that happen to be invoked on it. The next
+chapter takes up the other kinds of array index — multidimensional, sparse, and non-integer
+— and the five-point stencil that makes two-dimensional indexing worth having.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ch3_chare_arrays/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 3 — Chare Arrays">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 3 — Chare Arrays
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../ch5_array_indices/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 5 — Array Indices">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Chapter 5 — Array Indices
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

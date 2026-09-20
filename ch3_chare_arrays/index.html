@@ -18,7 +18,7 @@
         <link rel="prev" href="../ch2_basic_chares/">
       
       
-        <link rel="next" href="../ch4_sdag/">
+        <link rel="next" href="../ch4_reductions/">
       
       
         
@@ -542,14 +542,68 @@
   
   
     <li class="md-nav__item">
-      <a href="../ch4_sdag/" class="md-nav__link">
+      <a href="../ch4_reductions/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chapter 4 — Structured Dagger
+    Chapter 4 — Reductions and Broadcasts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_array_indices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Array Indices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Structured Dagger
   
 
     
@@ -596,14 +650,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ch5_pup/" class="md-nav__link">
+      <a href="../ch7_pup/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chapter 5 — PUP
+    Chapter 7 — PUP
   
 
     
@@ -623,14 +677,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ch6_load_balancing/" class="md-nav__link">
+      <a href="../ch8_load_balancing/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chapter 6 — Load Balancing
+    Chapter 8 — Load Balancing
   
 
     
@@ -650,14 +704,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ch7_threaded/" class="md-nav__link">
+      <a href="../ch9_threaded/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chapter 7 — Threaded Methods
+    Chapter 9 — Threaded Methods
   
 
     
@@ -880,8 +934,7 @@ widely used construct in Charm++, and nearly every program from here on is built
 indexed by bit vectors or by strings. They may be <strong>dense</strong> (every index from 0 to n−1
 exists) or <strong>sparse</strong> — a 1D array might hold 10,000 elements with indices scattered over
 the range 10 million to 20 million. This chapter uses dense 1D arrays throughout; the other
-index types are previewed at the end, and covered fully in the chapter on array
-indices.</p>
+index types are previewed at the end, and covered fully in Chapter 5.</p>
 <hr />
 <h2 id="declaring-a-chare-array">Declaring a Chare Array<a class="headerlink" href="#declaring-a-chare-array" title="Permanent link">&para;</a></h2>
 <p>A chare array is declared in the <code>.ci</code> file with the <code>array</code> keyword and a dimensionality:</p>
@@ -907,7 +960,7 @@ proxy class, <code>CProxy_Ring</code>.</p>
 </code></pre></div>
 <p>The <code>CkMigrateMessage *</code> constructor matters more here than it did in Chapter 2: array
 elements are the migratable unit in Charm++, and the load balancer will move them
-(covered in the load-balancing chapter). It can stay empty for now.</p>
+(Chapter 8). It can stay empty for now.</p>
 <hr />
 <h2 id="creating-the-array">Creating the Array<a class="headerlink" href="#creating-the-array" title="Permanent link">&para;</a></h2>
 <p>The whole array is created with one <code>ckNew</code> call:</p>
@@ -1191,8 +1244,8 @@ with one extent per dimension:</p>
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">grid</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">).</span><span class="n">startStep</span><span class="p">();</span><span class="w">                       </span><span class="c1">// address one element</span>
 </code></pre></div>
 <p>Inside an element, <code>thisIndex</code> is a struct rather than an <code>int</code> — <code>thisIndex.x</code> and
-<code>thisIndex.y</code> for a 2D array. A later chapter works through a 2D five-point stencil,
-which is where multidimensional indexing earns its keep.</p>
+<code>thisIndex.y</code> for a 2D array. Chapter 5 works through a 2D five-point stencil, which is
+where multidimensional indexing earns its keep.</p>
 <p><strong>Sparse.</strong> An array need not be created with a size at all. Start it empty and insert the
 elements that exist:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">CProxy_Compute</span><span class="w"> </span><span class="n">computeArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Compute</span><span class="o">::</span><span class="n">ckNew</span><span class="p">();</span><span class="w">   </span><span class="c1">// no elements yet</span>
@@ -1206,7 +1259,7 @@ built — only the indices that exist are inserted. Note the bracket form with a
 above is shorthand for it.</p>
 <p><strong>Bit vectors and strings.</strong> An index can also be a bit vector or a string, for collections
 whose natural name is not a tuple of integers.</p>
-<p>The chapter on array indices covers these properly. The molecular dynamics mini-application
+<p>Chapter 5 covers these properly. The molecular dynamics mini-application
 <a href="https://github.com/UIUC-PPL/leanmd">LeanMD</a> is worth looking at alongside it: it pairs a
 dense <code>array [3D] Cell</code> of spatial cells with a sparse <code>array [6D] Compute</code>, where a
 Compute element indexed <code>(x1,y1,z1,x2,y2,z2)</code> computes forces between the pair of cells
@@ -1330,13 +1383,13 @@ from every element and delivers the result to one place.</p>
         
         
           
-          <a href="../ch4_sdag/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 4 — Structured Dagger">
+          <a href="../ch4_reductions/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 4 — Reductions and Broadcasts">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Chapter 4 — Structured Dagger
+                Chapter 4 — Reductions and Broadcasts
               </div>
             </div>
             <div class="md-footer__button md-icon">
