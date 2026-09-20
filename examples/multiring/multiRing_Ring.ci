@@ -1,0 +1,12 @@
+module multiRing_Ring {
+
+  // Include the Main module (for the CProxy_Main parameter below)
+  extern module multiRing_Main;
+
+  // Declare chare objects/collections for the Ring module
+  array [1D] Ring {
+    entry Ring(CProxy_Main mp, int rs, int rID);
+    entry void doSomething(int elementsLeft, int tripsLeft, int fromIndex, int fromPE);
+  };
+
+};

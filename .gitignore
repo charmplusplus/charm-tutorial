@@ -12,6 +12,7 @@ charmrun
 examples/dht/dht
 examples/fib_thr/fib_thr
 examples/kmeans/kmeans
+examples/multiring/multiRing
 examples/oddevensort/sort
 examples/oddevensort_sdag/sort
 examples/particles/particles

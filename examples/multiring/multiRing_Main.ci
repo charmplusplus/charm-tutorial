@@ -1,0 +1,12 @@
+mainmodule multiRing_Main {
+
+  // Declare chare objects/collections for the Main module
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry void ringFinished();
+  };
+
+  // Include the Ring module
+  extern module multiRing_Ring;
+
+};
