@@ -22,12 +22,17 @@ example programs in `examples/`; build and run them as you read.
 
 ## Building the example programs
 
-Each example directory has its own `Makefile`. Point `CHARM_HOME` at a Charm++
-build and run `make`:
+Each example directory has its own `Makefile`. Point `CHARM_HOME` at your Charm++
+build directory — the one named for your platform, containing `bin/charmc` — and
+run `make`:
 
+    export CHARM_HOME=$HOME/charm/netlrts-linux-x86_64
     cd examples/primes
-    make CHARM_HOME=/path/to/charm/<build-dir>
-    ./charmrun ++local +p4 ./primes 1000
+    make
+    ./charmrun ++local +p4 ./primes 20
+
+See [Getting started](https://charmplusplus.org/charm-tutorial/#getting-started)
+for installing Charm++ itself.
 
 ## Building the website
 

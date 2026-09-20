@@ -26,7 +26,51 @@ The [DHT exercise](exercise_dht.md) provides additional practice between Chapter
 
 - Solid C++ knowledge (classes, pointers, templates)
 - Basic familiarity with parallel computing concepts (processes, threads, communication)
-- A working Charm++ installation
+- A working Charm++ installation — see *Getting started* below
+
+## Getting started
+
+### 1. Install Charm++
+
+Follow the official instructions, which are kept current with each release:
+
+- [Installing Charm++](https://charm.readthedocs.io/en/latest/quickstart.html#installing-charm)
+  — the Quickstart: download a release and build it with `./build`. Start here.
+- [Installing Charm++ (manual)](https://charm.readthedocs.io/en/latest/charm++/manual.html#installing-charm)
+  — the full chapter, covering manual builds, CMake, Spack, and the options for
+  specific network layers and platforms.
+
+The build produces a directory named for your platform — `netlrts-linux-x86_64`,
+`netlrts-darwin-arm8`, and so on — containing `bin/charmc`. That directory is what
+the tutorial calls `CHARM_HOME`.
+
+### 2. Get the tutorial examples
+
+Every chapter is backed by complete, compilable programs. Clone them:
+
+```bash
+git clone https://github.com/charmplusplus/charm-tutorial.git
+cd charm-tutorial
+```
+
+### 3. Build and run one example
+
+Point `CHARM_HOME` at your Charm++ build directory and build the first example:
+
+```bash
+export CHARM_HOME=$HOME/charm/netlrts-linux-x86_64   # your build directory
+
+cd examples/primes
+make
+./charmrun ++local +p4 ./primes 20
+```
+
+`primes` tests 20 randomly generated numbers for primality, one chare per number, and
+prints a `prime` / `not prime` line for each before `End of program`. If you see that,
+your toolchain is working and you are ready for Chapter 1.
+
+If `make` cannot find `charmc`, `CHARM_HOME` is pointing at the wrong directory — it must be the *build* directory (the one named after your
+platform), not the top of the Charm++ source tree.
 
 ## How to use this tutorial
 
