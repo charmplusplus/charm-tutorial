@@ -1,0 +1,46 @@
+mainmodule sort {
+  readonly int numElems;
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Sorter sortArr;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void allDone(int numCorrect);
+  };
+
+  array [1D] Sorter {
+    entry Sorter();
+    entry void receiveVal(int round, int val);
+    entry void start() {
+      for (round = 0; round < numElems; round++) {
+        serial {
+          int offset = round % 2;
+          amLeft  = ((thisIndex % 2) == offset) && (thisIndex + 1 < numElems);
+          amRight = ((thisIndex % 2) != offset) && (thisIndex > 0);
+          if (amLeft) {
+            usleep(rand() % 5001);
+            sortArr[thisIndex + 1].receiveVal(round, value);
+          }
+          if (amRight) {
+            usleep(rand() % 5001);
+            sortArr[thisIndex - 1].receiveVal(round, value);
+          }
+        }
+        if (amLeft || amRight)
+          when receiveVal[round](int r, int partnerVal) serial {
+            if (amLeft) value = std::min(value, partnerVal);
+            else        value = std::max(value, partnerVal);
+          }
+      }
+      serial {
+        int expected = thisIndex + 1;
+        CkPrintf("Sorter[%d] = %d  (expected %d)  %s\n",
+                 thisIndex, value, expected,
+                 (value == expected) ? "OK" : "WRONG");
+        int correct = (value == expected) ? 1 : 0;
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(sizeof(int), &correct, CkReduction::sum_int, cb);
+      }
+    };
+  };
+};

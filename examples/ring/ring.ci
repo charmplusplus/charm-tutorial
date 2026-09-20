@@ -1,0 +1,13 @@
+mainmodule ring {
+
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry void ringFinished();
+  };
+
+  array [1D] Ring {
+    entry Ring(CProxy_Main mp, int ringSize);
+    entry void doSomething(int elementsLeft, int tripsLeft, int fromIndex, int fromPE);
+  };
+
+};

@@ -1,0 +1,12 @@
+mainmodule reduction {
+
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry [reductiontarget] void printResult(int result);
+  };
+
+  array [1D] Elem {
+    entry Elem(CProxy_Main mainProxy);
+  };
+
+};

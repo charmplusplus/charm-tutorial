@@ -1,0 +1,40 @@
+mainmodule tmethod {
+
+  readonly int numWorkers;
+  readonly int maxIter;
+  readonly int lbPeriod;
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Worker workerArray;
+
+  message ValMsg;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void allDone();
+  };
+
+  array [1D] Worker {
+    entry Worker();
+    entry void sendValue(CkFuture replyTo);
+    entry [sync] ValMsg* syncGetValue();
+    entry [threaded] void runPhase(int phaseStart, int phaseEnd);
+    entry void phaseDone();
+    entry void resumeFromSync();
+    entry void start() {
+      for (phase = 0; phase * lbPeriod < maxIter; phase++) {
+        serial {
+          int s = phase * lbPeriod;
+          int e = (s + lbPeriod < maxIter) ? s + lbPeriod : maxIter;
+          thisProxy[thisIndex].runPhase(s, e);
+        }
+        when phaseDone() serial { AtSync(); }
+        when resumeFromSync() serial { }
+      }
+      serial {
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(cb);
+      }
+    };
+  };
+
+};

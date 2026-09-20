@@ -1,0 +1,39 @@
+mainmodule synth {
+
+  readonly int numWorkers;
+  readonly int maxIter;
+  readonly int lbPeriod;
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Worker workerArray;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void iterDone();
+    entry [reductiontarget] void allDone();
+  };
+
+  array [1D] Worker {
+    entry Worker();
+    entry void nextIter();
+    entry void resumeFromSync();
+    entry void start() {
+      for (iteration = 0; iteration < maxIter; iteration++) {
+        serial {
+          doWork();
+          CkCallback cb(CkReductionTarget(Main, iterDone), mainProxy);
+          contribute(cb);
+        }
+        when nextIter() serial { }
+        if ((iteration + 1) % lbPeriod == 0) {
+          serial { AtSync(); }
+          when resumeFromSync() serial { }
+        }
+      }
+      serial {
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(cb);
+      }
+    };
+  };
+
+};

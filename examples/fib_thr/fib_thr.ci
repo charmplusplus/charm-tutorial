@@ -1,0 +1,17 @@
+mainmodule fib_thr {
+
+  message LongMsg;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [threaded] void run();
+  };
+
+  // Each Fib chare computes fib(n) and sends the result to parentFut.
+  // The constructor stores arguments and queues the threaded compute() method.
+  chare Fib {
+    entry Fib(int n, CkFuture parentFut);
+    entry [threaded] void compute();
+  };
+
+};

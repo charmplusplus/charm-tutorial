@@ -1,0 +1,15 @@
+mainmodule sort {
+  readonly int numElems;
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Sorter sortArr;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void allDone(int numCorrect);
+  };
+
+  array [1D] Sorter {
+    entry Sorter();
+    entry void receiveVal(int val, int round);
+  };
+};

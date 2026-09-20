@@ -1,0 +1,13 @@
+mainmodule ring_reduction {
+
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry [reductiontarget] void reductionDone(int sum);
+  };
+
+  array [1D] Ring {
+    entry Ring(CProxy_Main mp, int ringSize, int tripCount);
+    entry void doSomething(int elementsLeft, int tripsLeft, int fromIndex, int fromPE);
+  };
+
+};

@@ -1,0 +1,10 @@
+mainmodule primes {
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry void done(int index, int result);
+  };
+
+  chare CheckPrimality {
+    entry CheckPrimality(int index, long number, CProxy_Main mainProxy);
+  };
+};

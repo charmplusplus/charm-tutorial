@@ -1,0 +1,43 @@
+mainmodule stencil_lb {
+
+  readonly int gridSize;
+  readonly int tileSize;
+  readonly int numTiles;
+  readonly int maxIter;
+  readonly int lbPeriod;
+  readonly CProxy_Main mainProxy;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void iterDone();
+    entry [reductiontarget] void allDone();
+  };
+
+  array [2D] Tile {
+    entry Tile();
+    entry void recvGhost(int side, int n, float data[n]);
+    entry void ghostsDone();
+    entry void nextIter();
+    entry void resumeFromSync();
+    entry void run() {
+      for (iter = 0; iter < maxIter; iter++) {
+        serial { sendGhosts(); }
+        when ghostsDone() serial {
+          doCalc();
+          CkCallback cb(CkReductionTarget(Main, iterDone), mainProxy);
+          contribute(cb);
+        }
+        when nextIter() serial { }
+        if ((iter + 1) % lbPeriod == 0) {
+          serial { AtSync(); }
+          when resumeFromSync() serial { }
+        }
+      }
+      serial {
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(cb);
+      }
+    };
+  };
+
+};

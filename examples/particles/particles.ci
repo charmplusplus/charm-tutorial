@@ -1,0 +1,42 @@
+mainmodule particles {
+
+  readonly int k;          // chare array is k x k
+  readonly int nPerCell;   // initial particles per cell
+  readonly int maxIter;    // total iterations
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_Cell cellArray;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void reportMax(int maxCount);
+    entry [reductiontarget] void allDone();
+  };
+
+  array [2D] Cell {
+    entry Cell();
+    entry void receiveParticles(int step, int n, double xs[n], double ys[n]);
+    entry void start() {
+      for (iteration = 0; iteration < maxIter; iteration++) {
+        serial { sendParticles(); }
+        for (neighborsDone = 0; neighborsDone < numNeighbors; neighborsDone++) {
+          when receiveParticles[iteration](int step, int n, double xs[n], double ys[n]) serial {
+            for (int i = 0; i < n; i++) {
+              px.push_back(xs[i]);
+              py.push_back(ys[i]);
+            }
+          }
+        }
+        if (iteration % 10 == 9) serial {
+          int count = (int)px.size();
+          CkCallback cb(CkReductionTarget(Main, reportMax), mainProxy);
+          contribute(sizeof(int), &count, CkReduction::max_int, cb);
+        }
+      }
+      serial {
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(0, NULL, CkReduction::nop, cb);
+      }
+    };
+  };
+
+};

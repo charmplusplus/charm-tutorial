@@ -1,0 +1,19 @@
+mainmodule kmeans {
+
+  readonly int K;                   // number of clusters
+  readonly int numPoints;           // total points M
+  readonly int numChares;           // number of Points chares N
+  readonly CProxy_Main mainProxy;   // so Points can address Main for reductions
+
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry [reductiontarget] void updateCounts(int n, int counts[n]);
+    entry [reductiontarget] void updateCoords(int n, double coords[n]);
+  };
+
+  array [1D] Points {
+    entry Points();
+    entry void assign(int K2, double centroids[K2]);
+  };
+
+};

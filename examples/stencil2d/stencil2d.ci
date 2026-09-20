@@ -1,0 +1,20 @@
+mainmodule stencil2d {
+
+  readonly int gridSize;          // total grid is gridSize x gridSize elements
+  readonly int tileSize;          // each tile is tileSize x tileSize elements
+  readonly int numTiles;          // grid is numTiles x numTiles tiles (gridSize/tileSize)
+  readonly float epsilon;         // convergence threshold
+  readonly CProxy_Main mainProxy; // for Tile to address reduction callback
+
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry [reductiontarget] void checkConvergence(float maxDiff);
+  };
+
+  array [2D] Tile {
+    entry Tile();
+    entry void startStep();
+    entry void recvGhost(int side, int n, float data[n]);
+  };
+
+};

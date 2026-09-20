@@ -1,0 +1,11 @@
+mainmodule primes_b {
+  mainchare Main {
+    entry Main(CkArgMsg *m);
+    entry void done(int batchIdx, int batchSize, int results[batchSize]);
+  };
+
+  chare CheckPrimality {
+    entry CheckPrimality(int batchIdx, int batchSize, long numbers[batchSize],
+                         CProxy_Main mainProxy);
+  };
+};

@@ -1,0 +1,40 @@
+mainmodule dht {
+
+  readonly int numChares;      // number of DHT elements (= table shards)
+  readonly int keysPerChare;   // entries each chare owns in the table
+  readonly int queriesPerChare;// K: random lookups each chare issues
+  readonly CProxy_Main mainProxy;
+  readonly CProxy_DHT dhtArray;
+
+  mainchare Main {
+    entry Main(CkArgMsg*);
+    entry [reductiontarget] void allDone(int totalErrors);
+  };
+
+  array [1D] DHT {
+    entry DHT();
+    entry void request(int key, int callerIndex);
+    entry void response(int key, int value);
+    entry void start() {
+      serial {
+        // Send K random-key requests; each carries thisIndex as the reply address.
+        for (int q = 0; q < queriesPerChare; q++) {
+          int key = rand_r(&seed) % (numChares * keysPerChare);
+          int owner = key / keysPerChare;
+          dhtArray[owner].request(key, thisIndex);
+        }
+      }
+      for (responsesReceived = 0; responsesReceived < queriesPerChare; responsesReceived++) {
+        when response(int key, int value) serial {
+          int expected = tableValue(key);
+          if (value != expected) errorCount++;
+        }
+      }
+      serial {
+        CkCallback cb(CkReductionTarget(Main, allDone), mainProxy);
+        contribute(sizeof(int), &errorCount, CkReduction::sum_int, cb);
+      }
+    };
+  };
+
+};
