@@ -1,4 +1,4 @@
-# Chapter 6: Load Balancing
+# Chapter 8: Load Balancing
 
 ## The Problem: Load Imbalance
 
@@ -341,7 +341,7 @@ no migration.
 
 ## PUP for Complex Chares: Only Migrate Live State
 
-Chapter 5 introduced the PUP framework. When a chare with heap-allocated members
+Chapter 7 introduced the PUP framework. When a chare with heap-allocated members
 migrates, the `pup()` method must correctly pack everything needed to **resume
 computation correctly** on the new PE. But it should **not** pack state that will be
 overwritten before it is read — migrating dead data wastes network bandwidth.

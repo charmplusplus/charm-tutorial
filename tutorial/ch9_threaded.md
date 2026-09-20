@@ -1,4 +1,4 @@
-# Chapter 7: Threaded Entry Methods
+# Chapter 9: Threaded Entry Methods
 
 ## Motivation
 
@@ -24,7 +24,7 @@ thread**. These are not OS threads:
 - **No locking needed** for chare state. At most one thread per chare runs at a time.
 - **Cooperative concurrency.** While a thread is blocked, the PE's scheduler processes
   other messages — including regular entry methods for the **same** chare. This is how
-  the `sendValue` method in Chapter 4's neighbor-exchange example can execute on the
+  the `sendValue` method in Chapter 6's neighbor-exchange example can execute on the
   same PE as the thread that is waiting for it.
 
 The primary example in this chapter is `examples/fib_thr/`, which computes Fibonacci
@@ -414,7 +414,7 @@ void ResumeFromSync() {
 
 **Exercise 1 — Odd-even sort with threaded entry methods.**
 
-In Chapter 4 you implemented odd-even transposition sort using SDAG. Rewrite the sort
+In Chapter 6 you implemented odd-even transposition sort using SDAG. Rewrite the sort
 using a `[threaded]` entry method instead. Each array element should run a loop over
 rounds; in each round it uses a `CkFuture` to fetch its neighbor's value and conditionally
 swap. Compare the code clarity to the SDAG version.

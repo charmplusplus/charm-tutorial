@@ -33,11 +33,13 @@ nav:
   - Chapter 1 — Introduction: ch1_introduction.md
   - Chapter 2 — Basic Chares: ch2_basic_chares.md
   - Chapter 3 — Chare Arrays: ch3_chare_arrays.md
-  - Chapter 4 — Structured Dagger: ch4_sdag.md
+  - Chapter 4 — Reductions and Broadcasts: ch4_reductions.md
+  - Chapter 5 — Array Indices: ch5_array_indices.md
+  - Chapter 6 — Structured Dagger: ch6_sdag.md
   - Exercise — DHT: exercise_dht.md
-  - Chapter 5 — PUP: ch5_pup.md
-  - Chapter 6 — Load Balancing: ch6_load_balancing.md
-  - Chapter 7 — Threaded Methods: ch7_threaded.md
+  - Chapter 7 — PUP: ch7_pup.md
+  - Chapter 8 — Load Balancing: ch8_load_balancing.md
+  - Chapter 9 — Threaded Methods: ch9_threaded.md
 
 markdown_extensions:
   - pymdownx.highlight:

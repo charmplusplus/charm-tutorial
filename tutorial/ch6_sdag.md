@@ -1,4 +1,4 @@
-# Chapter 4: Structured Dagger (SDAG)
+# Chapter 6: Structured Dagger (SDAG)
 
 The programs you wrote in the previous exercises — parallel prefix sum and odd-even
 transposition sort — are correct, but they share an uncomfortable structural property.

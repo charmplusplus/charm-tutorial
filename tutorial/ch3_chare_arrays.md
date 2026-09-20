@@ -20,8 +20,7 @@ Chare arrays are indexed by integers in one through six dimensions, and they can
 indexed by bit vectors or by strings. They may be **dense** (every index from 0 to n−1
 exists) or **sparse** — a 1D array might hold 10,000 elements with indices scattered over
 the range 10 million to 20 million. This chapter uses dense 1D arrays throughout; the other
-index types are previewed at the end, and covered fully in the chapter on array
-indices.
+index types are previewed at the end, and covered fully in Chapter 5.
 
 ---
 
@@ -57,7 +56,7 @@ public:
 
 The `CkMigrateMessage *` constructor matters more here than it did in Chapter 2: array
 elements are the migratable unit in Charm++, and the load balancer will move them
-(covered in the load-balancing chapter). It can stay empty for now.
+(Chapter 8). It can stay empty for now.
 
 ---
 
@@ -439,8 +438,8 @@ grid(i, j).startStep();                       // address one element
 ```
 
 Inside an element, `thisIndex` is a struct rather than an `int` — `thisIndex.x` and
-`thisIndex.y` for a 2D array. A later chapter works through a 2D five-point stencil,
-which is where multidimensional indexing earns its keep.
+`thisIndex.y` for a 2D array. Chapter 5 works through a 2D five-point stencil, which is
+where multidimensional indexing earns its keep.
 
 **Sparse.** An array need not be created with a size at all. Start it empty and insert the
 elements that exist:
@@ -460,7 +459,7 @@ above is shorthand for it.
 **Bit vectors and strings.** An index can also be a bit vector or a string, for collections
 whose natural name is not a tuple of integers.
 
-The chapter on array indices covers these properly. The molecular dynamics mini-application
+Chapter 5 covers these properly. The molecular dynamics mini-application
 [LeanMD](https://github.com/UIUC-PPL/leanmd) is worth looking at alongside it: it pairs a
 dense `array [3D] Cell` of spatial cells with a sparse `array [6D] Compute`, where a
 Compute element indexed `(x1,y1,z1,x2,y2,z2)` computes forces between the pair of cells

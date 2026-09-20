@@ -1,4 +1,4 @@
-# Chapter 5: PUP — Packing and Unpacking
+# Chapter 7: PUP — Packing and Unpacking
 
 Two things in Charm++ require serializing an object's state:
 

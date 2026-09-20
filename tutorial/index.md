@@ -16,12 +16,14 @@ hardware.
 | [Chapter 1](ch1_introduction.md) | The XMAPP model — overdecomposition, asynchrony, migration, adaptivity |
 | [Chapter 2](ch2_basic_chares.md) | Chares, proxies, entry methods, grainsize |
 | [Chapter 3](ch3_chare_arrays.md) | Chare arrays — indexed collections, element addressing, multiple arrays, modules |
-| [Chapter 4](ch4_sdag.md) | Structured Dagger (SDAG) — sequential notation for message-driven code |
-| [Chapter 5](ch5_pup.md) | PUP — serializing objects for messages and migration |
-| [Chapter 6](ch6_load_balancing.md) | Load balancing — AtSync, LB strategies, PUP for live variables |
-| [Chapter 7](ch7_threaded.md) | Threaded entry methods — CkFuture, [sync], phase pattern |
+| [Chapter 4](ch4_reductions.md) | Reductions and broadcasts — collective operations over an array, readonly variables |
+| [Chapter 5](ch5_array_indices.md) | Array indices — multidimensional, sparse, the five-point stencil |
+| [Chapter 6](ch6_sdag.md) | Structured Dagger (SDAG) — sequential notation for message-driven code |
+| [Chapter 7](ch7_pup.md) | PUP — serializing objects for messages and migration |
+| [Chapter 8](ch8_load_balancing.md) | Load balancing — AtSync, LB strategies, PUP for live variables |
+| [Chapter 9](ch9_threaded.md) | Threaded entry methods — CkFuture, [sync], phase pattern |
 
-The [DHT exercise](exercise_dht.md) provides additional practice between Chapters 4 and 5.
+The [DHT exercise](exercise_dht.md) provides additional practice between Chapters 6 and 7.
 
 ## Prerequisites
 
