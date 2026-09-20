@@ -1,0 +1,966 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch1_introduction/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../ch2_basic_chares/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 1 — Introduction - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-1-introduction-and-the-xmapp-model" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 1 — Introduction
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-parallel-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Parallel Computing?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-xmapp-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The XMAPP Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The XMAPP Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overdecomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overdecomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asynchronous-message-driven-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous Message-Driven Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migratability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migratability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-adaptive-runtime-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Adaptive Runtime System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xmapp-instantiations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XMAPP Instantiations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch2_basic_chares/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch3_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch4_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_threaded/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-parallel-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Parallel Computing?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-xmapp-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The XMAPP Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The XMAPP Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overdecomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overdecomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asynchronous-message-driven-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous Message-Driven Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migratability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migratability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-adaptive-runtime-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Adaptive Runtime System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xmapp-instantiations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XMAPP Instantiations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-1-introduction-and-the-xmapp-model">Chapter 1: Introduction and the XMAPP Model<a class="headerlink" href="#chapter-1-introduction-and-the-xmapp-model" title="Permanent link">&para;</a></h1>
+<h2 id="why-parallel-computing">Why Parallel Computing?<a class="headerlink" href="#why-parallel-computing" title="Permanent link">&para;</a></h2>
+<p>The free lunch from sequential hardware improvements ended around 2003. Clock frequencies
+stopped rising because chips would generate too much heat. Since then, silicon engineers have
+responded by putting more cores on a chip rather than making individual cores faster. The
+result: parallelism is no longer a specialty — it is the default mode of modern hardware.
+Even a laptop has 8 or more cores. Supercomputers today have millions.</p>
+<p>This shift means that extracting performance from hardware requires parallel programming.
+But parallel programming is hard. The central challenge is coordination: how do you divide
+work across many processors, keep them busy, and let them communicate — without the
+programmer having to micromanage every detail?</p>
+<h2 id="the-xmapp-model">The XMAPP Model<a class="headerlink" href="#the-xmapp-model" title="Permanent link">&para;</a></h2>
+<p>Charm++ is built on a parallel programming model called <strong>XMAPP</strong>. Rather than a new
+language, XMAPP is a set of principles for structuring parallel interactions. Sequential code
+stays in C++; XMAPP governs how parallel objects are decomposed, mapped, and scheduled.</p>
+<p>XMAPP rests on three complementary ideas: <strong>overdecomposition</strong>,
+<strong>asynchronous message-driven execution</strong>, and <strong>migratability</strong>.</p>
+<hr />
+<h3 id="overdecomposition">Overdecomposition<a class="headerlink" href="#overdecomposition" title="Permanent link">&para;</a></h3>
+<p>In traditional parallel programming (such as MPI), the programmer divides the problem
+into exactly as many pieces as there are processors. This ties the decomposition to the
+hardware: change the processor count and you may need to restructure the program.</p>
+<p>XMAPP takes a different approach. The programmer decomposes the problem into
+<strong>more pieces than there are processors</strong> — typically many more. These pieces are called
+<em>work units</em>. The runtime system then maps work units to processors and schedules their
+execution.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>User&#39;s view                    Runtime&#39;s view
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-----------                    --------------
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  A[0]  A[1]  A[2]              Processor 0    Processor 1
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  B[0]  B[1]                    A[0] A[2] B[1]   A[1] B[0]
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  C[0]  C[1]  C[2]  C[3]        C[0] C[2]        C[1] C[3]
+</code></pre></div>
+<p>The programmer writes the program entirely in terms of work units. No programmer-written
+code coordinates which units live on which processor. That mapping is the runtime's job.</p>
+<p>This separation has several consequences:</p>
+<ul>
+<li><strong>Communication-computation overlap</strong>: when one work unit is waiting for data, another
+  on the same processor can run.</li>
+<li><strong>Modularity</strong>: independent modules (e.g., a fluid solver and a solid solver in a rocket
+  simulation) can each be decomposed naturally, and the runtime interleaves them.</li>
+<li><strong>Adaptivity</strong>: because work units can be moved, the runtime can rebalance load as
+  execution proceeds.</li>
+</ul>
+<hr />
+<h3 id="asynchronous-message-driven-execution">Asynchronous Message-Driven Execution<a class="headerlink" href="#asynchronous-message-driven-execution" title="Permanent link">&para;</a></h3>
+<p>Work units interact by sending <strong>messages</strong>. Sending a message in XMAPP is
+non-blocking: the sender does not wait for the recipient to act. This is the key distinction
+from a function call or RPC.</p>
+<p>A useful analogy: a function call is like a phone call — the caller waits on the line until
+the recipient answers and replies. An XMAPP message is like an email — the sender sends
+it and immediately returns to other work. The recipient processes the message at its leisure.</p>
+<p>On each processor, the runtime maintains a <strong>scheduler</strong> with a queue of pending
+messages. After a work unit finishes processing one message, the scheduler picks the next
+message from the queue and dispatches it. The programmer never writes a scheduling loop;
+the runtime drives execution entirely through message arrivals.</p>
+<p>This style is called <em>message-driven execution</em>. Combined with overdecomposition — many
+work units per processor — it lets the runtime overlap communication with computation
+automatically: while one work unit waits for a message to arrive, others are already in the
+queue ready to execute.</p>
+<hr />
+<h3 id="migratability">Migratability<a class="headerlink" href="#migratability" title="Permanent link">&para;</a></h3>
+<p>Because work units are not tied to specific processors, the runtime can <strong>migrate</strong> them
+— move them from one processor to another — at any point during execution. The runtime
+knows where every work unit lives (via a location management service), so messages are
+always delivered to the right place even after migration.</p>
+<p>Migratability is what makes the following runtime services possible without programmer
+effort:</p>
+<ul>
+<li><strong>Dynamic load balancing</strong>: if some processors are idle while others are overloaded, the
+  runtime moves work units to equalize the load.</li>
+<li><strong>Fault tolerance</strong>: a work unit's state can be checkpointed and restored on a replacement
+  processor.</li>
+<li><strong>Malleability</strong>: the job can shrink or expand (return or acquire processors) at runtime.</li>
+</ul>
+<hr />
+<h2 id="the-adaptive-runtime-system">The Adaptive Runtime System<a class="headerlink" href="#the-adaptive-runtime-system" title="Permanent link">&para;</a></h2>
+<p>The three pillars together give the runtime system two powerful capabilities:</p>
+<p><strong>Introspection</strong> — because the runtime mediates all message sends and schedules all
+entry method invocations, it can observe exactly how much computation each work unit
+does and who communicates with whom. This information is gathered automatically, without
+any instrumentation code from the programmer.</p>
+<p><strong>Adaptivity</strong> — armed with introspection data, the runtime can act: migrate work units
+for load balance, co-locate heavily communicating units, prefetch data, or reorder message
+execution by priority.</p>
+<p>The programmer provides what only they can know: how to decompose the problem domain.
+The runtime provides what only it can know: the state of the hardware and the execution.
+This division of labor is the core design philosophy of XMAPP.</p>
+<hr />
+<h2 id="xmapp-instantiations">XMAPP Instantiations<a class="headerlink" href="#xmapp-instantiations" title="Permanent link">&para;</a></h2>
+<p>XMAPP has been implemented in several languages. This tutorial focuses on <strong>Charm++</strong>,
+the C++ implementation. Other implementations include Charm4Py (Python) and AMPI
+(which allows existing MPI programs to benefit from overdecomposition and migratability
+without rewriting).</p>
+<hr />
+<h2 id="benefits-summary">Benefits Summary<a class="headerlink" href="#benefits-summary" title="Permanent link">&para;</a></h2>
+<p>The table below summarizes the main benefits of Charm++ and their sources:</p>
+<table>
+<thead>
+<tr>
+<th>Benefit</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Communication-computation overlap</td>
+<td>Overdecomposition + async execution</td>
+</tr>
+<tr>
+<td>Automatic dynamic load balancing</td>
+<td>Migratability + introspection</td>
+</tr>
+<tr>
+<td>Compositionality of modules</td>
+<td>Message-driven scheduling</td>
+</tr>
+<tr>
+<td>Prioritized execution</td>
+<td>Scheduler queue reordering</td>
+</tr>
+<tr>
+<td>Checkpointing and fault tolerance</td>
+<td>Migratability</td>
+</tr>
+<tr>
+<td>Malleability (shrink/expand)</td>
+<td>Migratability</td>
+</tr>
+</tbody>
+</table>
+<p>One contrast with MPI-style bulk-synchronous programs is worth highlighting. In a typical
+MPI program, processors compute for a while, then all communicate at once, then compute
+again. The network sits idle during the compute phase and becomes a bottleneck during the
+communication phase. With Charm++, many chares per processor means communication
+is spread across the entire execution and overlapped with computation — the network is
+used more uniformly and is rarely on the critical path.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Home
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../ch2_basic_chares/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 2 — Basic Chares">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Chapter 2 — Basic Chares
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

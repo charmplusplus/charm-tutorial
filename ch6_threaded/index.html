@@ -1,0 +1,1482 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch6_threaded/">
+      
+      
+        <link rel="prev" href="../ch5_load_balancing/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 6 — Threaded Methods - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-6-threaded-entry-methods" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 6 — Threaded Methods
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch1_introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch2_basic_chares/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch3_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch4_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-level-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-Level Threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-threaded-attribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The [threaded] Attribute
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-example-parallel-fibonacci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Example: Parallel Fibonacci
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Example: Parallel Fibonacci">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ci-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .ci file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-chare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main chare
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fib-chare-constructor-restriction-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fib chare — constructor restriction pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cthsuspend-and-cthawaken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CthSuspend and CthAwaken
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ckfuture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CkFuture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CkFuture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multiple-outstanding-futures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple outstanding futures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sync-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [sync] Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-vs-threaded-when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG vs Threaded: When to Use Which
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-restriction-and-the-lb-phase-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Restriction and the LB Phase Pattern
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration Restriction and the LB Phase Pattern">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ci-file-outer-sdag-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .ci file — outer SDAG loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-file-runphase-threaded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .C file — runPhase (threaded)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-for-each-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flow for each phase
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pup-for-this-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pup() for this pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-level-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-Level Threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-threaded-attribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The [threaded] Attribute
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-example-parallel-fibonacci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Example: Parallel Fibonacci
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Example: Parallel Fibonacci">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ci-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .ci file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-chare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main chare
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fib-chare-constructor-restriction-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fib chare — constructor restriction pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cthsuspend-and-cthawaken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CthSuspend and CthAwaken
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ckfuture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CkFuture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CkFuture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#multiple-outstanding-futures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple outstanding futures
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sync-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [sync] Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-vs-threaded-when-to-use-which" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG vs Threaded: When to Use Which
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#migration-restriction-and-the-lb-phase-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration Restriction and the LB Phase Pattern
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Migration Restriction and the LB Phase Pattern">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ci-file-outer-sdag-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .ci file — outer SDAG loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-file-runphase-threaded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .C file — runPhase (threaded)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-for-each-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flow for each phase
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pup-for-this-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pup() for this pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercises
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-6-threaded-entry-methods">Chapter 6: Threaded Entry Methods<a class="headerlink" href="#chapter-6-threaded-entry-methods" title="Permanent link">&para;</a></h1>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>SDAG <code>when</code> handles linear waiting patterns well: wait for one or two specific messages,
+then continue. But some algorithms have more complex control flow — recursive
+divide-and-conquer, nested request-reply chains, or loops that wait at each iteration.
+Expressing these as continuation graphs (the SDAG model) produces code that is hard to
+read and hard to get right.</p>
+<p>Threaded entry methods provide an alternative. They run in <strong>user-level cooperative
+threads</strong>, letting you write ordinary sequential C++ — loops, blocking waits, recursive
+calls — inside a Charm++ chare.</p>
+<hr />
+<h2 id="user-level-threads">User-Level Threads<a class="headerlink" href="#user-level-threads" title="Permanent link">&para;</a></h2>
+<p>The <code>[threaded]</code> attribute causes an entry method to run in a <strong>user-level (Converse)
+thread</strong>. These are not OS threads:</p>
+<ul>
+<li><strong>No preemption.</strong> The scheduler only gains control when the running thread explicitly
+  suspends — at a future wait, a sync call, or a direct <code>CthSuspend()</code>.</li>
+<li><strong>No locking needed</strong> for chare state. At most one thread per chare runs at a time.</li>
+<li><strong>Cooperative concurrency.</strong> While a thread is blocked, the PE's scheduler processes
+  other messages — including regular entry methods for the <strong>same</strong> chare. This is how
+  the <code>sendValue</code> method in Chapter 3's neighbor-exchange example can execute on the
+  same PE as the thread that is waiting for it.</li>
+</ul>
+<p>The primary example in this chapter is <code>examples/fib_thr/</code>, which computes Fibonacci
+numbers using parallel recursive chares. The LB phase pattern is shown separately in
+<code>examples/tmethod/</code>.</p>
+<hr />
+<h2 id="the-threaded-attribute">The <code>[threaded]</code> Attribute<a class="headerlink" href="#the-threaded-attribute" title="Permanent link">&para;</a></h2>
+<p>In the <code>.ci</code> file, prepend <code>[threaded]</code> to an entry method declaration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">threaded</span><span class="p">]</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">run</span><span class="p">();</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">threaded</span><span class="p">]</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">compute</span><span class="p">();</span>
+</code></pre></div>
+<p>The implementation is an ordinary C++ method. You can declare local variables, write
+loops, call helper functions, and block at futures — all in straight-line code.</p>
+<p><strong>Restriction:</strong> Charm++ does not allow <code>[threaded]</code> constructors. If you need to start
+threaded work from object construction, write a plain constructor that stores its
+arguments and immediately sends a <code>[threaded]</code> entry method to <code>thisProxy</code>. The
+construction completes, the message is queued, and the scheduler picks it up and starts
+the thread. You will see this pattern in the Fibonacci example below.</p>
+<hr />
+<h2 id="running-example-parallel-fibonacci">Running Example: Parallel Fibonacci<a class="headerlink" href="#running-example-parallel-fibonacci" title="Permanent link">&para;</a></h2>
+<p>Fibonacci is a textbook divide-and-conquer problem. Computing <code>fib(n)</code> recursively
+spawns two subproblems; with threaded entry methods, we can launch both as chares and
+wait for both results before summing.</p>
+<h3 id="ci-file"><code>.ci</code> file<a class="headerlink" href="#ci-file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mainmodule fib_thr {
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  message LongMsg;
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  mainchare Main {
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    entry Main(CkArgMsg*);
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    entry [threaded] void run();
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>  };
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  chare Fib {
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    entry Fib(int n, CkFuture parentFut);   // plain constructor
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    entry [threaded] void compute();         // threaded work method
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  };
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>};
+</code></pre></div>
+<p><code>Main::run()</code> is <code>[threaded]</code> so it can block at <code>CkWaitFuture</code>. <code>Fib::compute()</code> is
+<code>[threaded]</code> so it can recursively wait for its own sub-results.</p>
+<h3 id="main-chare">Main chare<a class="headerlink" href="#main-chare" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">                              </span><span class="c1">// [threaded]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">CProxy_Fib</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">);</span><span class="w">             </span><span class="c1">// spawn root Fib chare</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">LongMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LongMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;fib(%d) = %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>CkCreateFuture()</code> creates a one-shot channel. <code>CkWaitFuture(f)</code> suspends the thread
+until someone sends to it. The root <code>Fib</code> chare is created with the future so it knows
+where to deliver its result.</p>
+<h3 id="fib-chare-constructor-restriction-pattern">Fib chare — constructor restriction pattern<a class="headerlink" href="#fib-chare-constructor-restriction-pattern" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Fib</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Fib</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">parentFut</span><span class="p">;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="c1">// Constructor stores state, queues the threaded compute().</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="n">Fib</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n_</span><span class="p">,</span><span class="w"> </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">n</span><span class="p">(</span><span class="n">n_</span><span class="p">),</span><span class="w"> </span><span class="n">parentFut</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="n">thisProxy</span><span class="p">.</span><span class="n">compute</span><span class="p">();</span><span class="w">             </span><span class="c1">// constructors may not be [threaded]</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">compute</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">                     </span><span class="c1">// [threaded]</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="kt">long</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">THRESHOLD</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">            </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seqFib</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">            </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">f1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">            </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">f2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">            </span><span class="n">CProxy_Fib</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">);</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">            </span><span class="n">CProxy_Fib</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">);</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">            </span><span class="n">LongMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LongMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">f1</span><span class="p">);</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">            </span><span class="n">LongMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">LongMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">f2</span><span class="p">);</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">            </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m1</span><span class="o">-&gt;</span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">            </span><span class="k">delete</span><span class="w"> </span><span class="n">m1</span><span class="p">;</span><span class="w"> </span><span class="k">delete</span><span class="w"> </span><span class="n">m2</span><span class="p">;</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="w">        </span><span class="n">LongMsg</span><span class="o">*</span><span class="w"> </span><span class="n">reply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">LongMsg</span><span class="p">;</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="w">        </span><span class="n">reply</span><span class="o">-&gt;</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">        </span><span class="n">CkSendToFuture</span><span class="p">(</span><span class="n">parentFut</span><span class="p">,</span><span class="w"> </span><span class="n">reply</span><span class="p">);</span><span class="w">  </span><span class="c1">// deliver result to parent</span>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="p">};</span>
+</code></pre></div>
+<p>The key points:</p>
+<ol>
+<li>
+<p><strong>Constructor restriction.</strong> The constructor stores <code>n</code> and <code>parentFut</code>, then sends
+   <code>thisProxy.compute()</code> to itself. The <code>[threaded]</code> annotation is on <code>compute()</code>, not
+   on the constructor.</p>
+</li>
+<li>
+<p><strong>Both sub-problems fire before either wait.</strong> <code>CProxy_Fib::ckNew(n-1, f1)</code> and
+   <code>ckNew(n-2, f2)</code> are called one after the other, both before any <code>CkWaitFuture</code>.
+   This means both child chares are created and can run concurrently. The current
+   thread then waits for <code>f1</code>; while it is suspended, the scheduler can start both
+   children. Waiting for <code>f2</code> afterwards is often instant because <code>fib(n-2)</code> finished
+   while <code>fib(n-1)</code> was running.</p>
+</li>
+<li>
+<p><strong>Below threshold, no chares.</strong> To avoid explosive chare creation for small <code>n</code>,
+   computation falls back to sequential <code>seqFib</code> when <code>n &lt;= THRESHOLD</code> (default 10).</p>
+</li>
+</ol>
+<h3 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>charmrun ++local +p4 ++ppn 2 ./fib_thr 30
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>fib(30) = 832040  (0.956 s)
+</code></pre></div>
+<hr />
+<h2 id="cthsuspend-and-cthawaken">CthSuspend and CthAwaken<a class="headerlink" href="#cthsuspend-and-cthawaken" title="Permanent link">&para;</a></h2>
+<p><code>CkFuture</code> is built on two lower-level primitives. Understanding them clarifies exactly
+what "blocking" means.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Member variables of the chare:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">CthThread</span><span class="w"> </span><span class="n">waitingThread</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kt">int</span><span class="w">       </span><span class="n">receivedVal</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1">// Inside the [threaded] entry method:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kt">void</span><span class="w"> </span><span class="nf">threadedMethod</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">waitingThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CthSelf</span><span class="p">();</span><span class="w">          </span><span class="c1">// capture handle to this thread</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">someProxy</span><span class="p">.</span><span class="n">asyncRequest</span><span class="p">(</span><span class="n">thisIndex</span><span class="p">);</span><span class="w">  </span><span class="c1">// will eventually call notifyDone()</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="n">CthSuspend</span><span class="p">();</span><span class="w">                       </span><span class="c1">// yield PE; scheduler runs</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="c1">// execution resumes here after CthAwaken</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Got: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">receivedVal</span><span class="p">);</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="p">}</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="c1">// Regular entry method called by the remote chare:</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="kt">void</span><span class="w"> </span><span class="nf">notifyDone</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="n">receivedVal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="n">CthAwaken</span><span class="p">(</span><span class="n">waitingThread</span><span class="p">);</span><span class="w">           </span><span class="c1">// re-schedule the suspended thread</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>CthSelf()</code> returns a handle to the currently executing thread. <code>CthSuspend()</code> yields
+it — control returns to the scheduler. <code>CthAwaken(t)</code> puts thread <code>t</code> back on the
+ready queue; it resumes at the statement after <code>CthSuspend()</code>.</p>
+<p>The <code>waitingThread</code> member must be saved <strong>before</strong> the async send, because (in
+principle) a fast reply could deliver <code>notifyDone()</code> on the same PE before
+<code>CthSuspend()</code> is reached. The Charm++ scheduler guarantees this can't happen within
+one message execution (no preemption), but storing the handle early is the correct
+idiom.</p>
+<p>Use <code>CthSuspend</code>/<code>CthAwaken</code> when you need custom waiting logic — for example,
+waiting until a counter reaches zero, or until <em>any</em> of several events fires. For
+simple one-result waits, <code>CkFuture</code> is more convenient; for request-reply, <code>[sync]</code> is
+cleanest.</p>
+<hr />
+<h2 id="ckfuture">CkFuture<a class="headerlink" href="#ckfuture" title="Permanent link">&para;</a></h2>
+<p><code>CkFuture</code> provides structured wait-for-one-result without manually storing a thread
+handle:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">CkFuture</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">remoteProxy</span><span class="p">.</span><span class="n">requestValue</span><span class="p">(</span><span class="n">f</span><span class="p">);</span><span class="w">           </span><span class="c1">// responder receives f</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ValMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">f</span><span class="p">);</span><span class="w"> </span><span class="c1">// suspend until CkSendToFuture(f, ...)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1">// use m-&gt;value ...</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+</code></pre></div>
+<p>The responder:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">requestValue</span><span class="p">(</span><span class="n">CkFuture</span><span class="w"> </span><span class="n">replyTo</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">reply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ValMsg</span><span class="p">;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">reply</span><span class="o">-&gt;</span><span class="n">value</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">CkSendToFuture</span><span class="p">(</span><span class="n">replyTo</span><span class="p">,</span><span class="w"> </span><span class="n">reply</span><span class="p">);</span><span class="w">    </span><span class="c1">// wakes the waiting thread</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><code>CkWaitFuture</code> calls <code>CthSuspend</code>; <code>CkSendToFuture</code> calls <code>CthAwaken</code>. The <code>CkFuture</code>
+type is a small struct (id + PE); it must be passed as a <strong>value</strong> parameter (<code>CkFuture
+replyTo</code>), not as a <code>CkFutureID</code>, which is only the unsigned-short id field and lacks
+the PE needed for cross-PE delivery.</p>
+<h3 id="multiple-outstanding-futures">Multiple outstanding futures<a class="headerlink" href="#multiple-outstanding-futures" title="Permanent link">&para;</a></h3>
+<p>Fire N requests before collecting any results so they proceed in parallel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">CkFuture</span><span class="w"> </span><span class="n">futures</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="n">futures</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">workers</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">sendValue</span><span class="p">(</span><span class="n">futures</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ValMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">futures</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">m</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>All N sends go out before the first wait. The Fibonacci example uses this pattern with
+N=2 — both <code>ckNew</code> calls happen before either <code>CkWaitFuture</code>.</p>
+<hr />
+<h2 id="sync-entry-methods"><code>[sync]</code> Entry Methods<a class="headerlink" href="#sync-entry-methods" title="Permanent link">&para;</a></h2>
+<p>For simple request-reply, <code>[sync]</code> offers the cleanest syntax. The caller blocks; the
+callee looks like an ordinary method that returns a value.</p>
+<p>Declare in the <code>.ci</code> file with a Charm++ message return type:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">sync</span><span class="p">]</span><span class="w"> </span><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">syncGetValue</span><span class="p">();</span>
+</code></pre></div>
+<p>Call from any <code>[threaded]</code> entry method:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">workerArray</span><span class="p">[</span><span class="n">right</span><span class="p">].</span><span class="n">syncGetValue</span><span class="p">();</span><span class="w">  </span><span class="c1">// blocks caller&#39;s thread</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+</code></pre></div>
+<p>The callee is a plain C++ method that returns a message:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="nf">syncGetValue</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">reply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ValMsg</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">reply</span><span class="o">-&gt;</span><span class="n">value</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">reply</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>Internally Charm++ creates a temporary future, sends the call, waits for the return, and
+frees the future — equivalent to the three-line <code>CkFuture</code> pattern written as a single
+blocking call.</p>
+<p><strong>Constraints:</strong>
+- <code>[sync]</code> can only be called from within a <code>[threaded]</code> entry method. Calling it from a
+  regular entry method deadlocks.
+- The return type must be a Charm++ message class (a subclass of <code>CMessage_Foo</code>).
+- The callee does not need to know it was called synchronously.</p>
+<hr />
+<h2 id="sdag-vs-threaded-when-to-use-which">SDAG vs Threaded: When to Use Which<a class="headerlink" href="#sdag-vs-threaded-when-to-use-which" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>SDAG <code>when</code></th>
+<th>Threaded + futures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programming model</td>
+<td>Event-driven (continuations)</td>
+<td>Sequential-looking</td>
+</tr>
+<tr>
+<td>Memory per chare</td>
+<td>Small (continuation state on heap)</td>
+<td>Thread stack (default 32 KB)</td>
+</tr>
+<tr>
+<td>Simple wait-for-one</td>
+<td>Natural</td>
+<td>Natural</td>
+</tr>
+<tr>
+<td>Loop with wait per iteration</td>
+<td>Awkward</td>
+<td>Natural</td>
+</tr>
+<tr>
+<td>Nested or recursive waits</td>
+<td>Very awkward</td>
+<td>Natural</td>
+</tr>
+<tr>
+<td>Multiple concurrent waits</td>
+<td>Natural with <code>overlap</code></td>
+<td>Explicit (fire N, collect in loop)</td>
+</tr>
+<tr>
+<td>Entry method overhead</td>
+<td>Low</td>
+<td>Slightly higher (thread context switch)</td>
+</tr>
+<tr>
+<td>Migration while active</td>
+<td>Always safe</td>
+<td><strong>Never safe</strong> (see below)</td>
+</tr>
+</tbody>
+</table>
+<p>Use SDAG for most patterns. Reach for threaded methods when the control flow is
+inherently sequential or recursive — divide-and-conquer, deeply nested request-reply, or
+algorithms that read most naturally as straight-line blocking code.</p>
+<hr />
+<h2 id="migration-restriction-and-the-lb-phase-pattern">Migration Restriction and the LB Phase Pattern<a class="headerlink" href="#migration-restriction-and-the-lb-phase-pattern" title="Permanent link">&para;</a></h2>
+<p><strong>A chare with an active threaded entry method cannot be migrated.</strong> The LB framework
+serializes chare state with <code>pup()</code> and reconstructs it on the target PE. Serializing a
+live thread stack requires the <code>isomalloc</code> feature (position-independent stack
+allocation), which is a research capability, not production-ready.</p>
+<p>The solution is the <strong>phase pattern</strong>: the threaded method runs for a bounded number of
+iterations (one "phase") and <em>returns</em>. The SDAG calls <code>AtSync()</code> after the thread has
+exited, in the quiet gap between phases where migration is safe.</p>
+<p>The full example is in <code>examples/tmethod/</code>. Workers form a 1D array; each iteration a
+worker asks its right neighbor for its value and averages it in. Iterations are grouped
+into phases of length <code>lbPeriod</code>.</p>
+<h3 id="ci-file-outer-sdag-loop"><code>.ci</code> file — outer SDAG loop<a class="headerlink" href="#ci-file-outer-sdag-loop" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>entry void start() {
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    for (phase = 0; phase * lbPeriod &lt; maxIter; phase++) {
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>        serial {
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>            int s = phase * lbPeriod;
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>            int e = (s + lbPeriod &lt; maxIter) ? s + lbPeriod : maxIter;
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>            thisProxy[thisIndex].runPhase(s, e);   // start the thread
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>        }
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>        when phaseDone() serial { AtSync(); }      // thread has returned; safe to migrate
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>        when resumeFromSync() serial { }           // resume after LB
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    }
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    serial { contribute(allDone); }
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>};
+</code></pre></div>
+<h3 id="c-file-runphase-threaded"><code>.C</code> file — <code>runPhase</code> (threaded)<a class="headerlink" href="#c-file-runphase-threaded" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">runPhase</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">numWorkers</span><span class="p">;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">;</span><span class="w"> </span><span class="n">iter</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">        </span><span class="n">CkFuture</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CkCreateFuture</span><span class="p">();</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">        </span><span class="n">workerArray</span><span class="p">[</span><span class="n">right</span><span class="p">].</span><span class="n">sendValue</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">        </span><span class="n">ValMsg</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ValMsg</span><span class="o">*</span><span class="p">)</span><span class="n">CkWaitFuture</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">        </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">thisProxy</span><span class="p">[</span><span class="n">thisIndex</span><span class="p">].</span><span class="n">phaseDone</span><span class="p">();</span><span class="w">   </span><span class="c1">// signal SDAG; thread then exits</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="flow-for-each-phase">Flow for each phase<a class="headerlink" href="#flow-for-each-phase" title="Permanent link">&para;</a></h3>
+<ol>
+<li>SDAG sends <code>runPhase(s, e)</code> to self and waits at <code>when phaseDone()</code>.</li>
+<li>Scheduler starts the threaded method.</li>
+<li><code>runPhase</code> runs all iterations using <code>CkFuture</code>, then sends <code>phaseDone()</code> and
+   <strong>returns</strong>. The thread is now gone.</li>
+<li>SDAG wakes, calls <code>AtSync()</code> — safe because no thread is active.</li>
+<li>LB may migrate the chare. After any migration, <code>ResumeFromSync()</code> sends
+   <code>resumeFromSync()</code> to the SDAG.</li>
+<li>Loop repeats for the next phase.</li>
+</ol>
+<h3 id="pup-for-this-pattern"><code>pup()</code> for this pattern<a class="headerlink" href="#pup-for-this-pattern" title="Permanent link">&para;</a></h3>
+<p>Because migration happens between phases, <code>pup()</code> only needs the chare's persistent
+state — no thread state to capture:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Worker</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kt">void</span><span class="w"> </span><span class="n">pup</span><span class="p">(</span><span class="n">PUP</span><span class="o">::</span><span class="n">er</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">phase</span><span class="p">;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">}</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="kt">void</span><span class="w"> </span><span class="n">ResumeFromSync</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">    </span><span class="n">thisProxy</span><span class="p">[</span><span class="n">thisIndex</span><span class="p">].</span><span class="n">resumeFromSync</span><span class="p">();</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>[threaded]</code> entry methods run in user-level cooperative threads, enabling sequential
+  blocking code inside Charm++ chares.</li>
+<li>While a thread is blocked, the PE processes other messages — including entry methods
+  for the same chare.</li>
+<li><strong>CthSuspend / CthAwaken</strong>: raw thread control. Store <code>CthSelf()</code>, issue an async
+  request, call <code>CthSuspend()</code>; the responder calls <code>CthAwaken()</code> to resume. Use when
+  you need custom wake conditions.</li>
+<li><strong>CkFuture</strong>: structured wait. <code>CkCreateFuture()</code> → pass to responder → <code>CkWaitFuture()</code>.
+  Fire multiple futures before the first wait to run sub-problems in parallel (as in
+  Fibonacci). Pass as <code>CkFuture</code>, not <code>CkFutureID</code>.</li>
+<li><strong><code>[sync]</code> methods</strong>: cleanest request-reply API. Callable only from threaded context;
+  return type must be a Charm++ message class.</li>
+<li><strong>Constructors may not be <code>[threaded]</code></strong>. The pattern: plain constructor stores
+  arguments and sends <code>thisProxy.compute()</code> to self; <code>compute()</code> carries the
+  <code>[threaded]</code> attribute.</li>
+<li><strong>Threaded methods cannot be migrated while active.</strong> Use the phase pattern: threaded
+  method runs a bounded loop and returns; SDAG calls <code>AtSync()</code> in the gap; after
+  <code>resumeFromSync()</code> the next phase begins.</li>
+</ul>
+<hr />
+<h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h2>
+<p><strong>Exercise 1 — Odd-even sort with threaded entry methods.</strong></p>
+<p>In Chapter 4 you implemented odd-even transposition sort using SDAG. Rewrite the sort
+using a <code>[threaded]</code> entry method instead. Each array element should run a loop over
+rounds; in each round it uses a <code>CkFuture</code> to fetch its neighbor's value and conditionally
+swap. Compare the code clarity to the SDAG version.</p>
+<p><strong>Exercise 2 — Parallel prefix sum.</strong></p>
+<p>Implement a parallel prefix sum (scan) over a 1D chare array using threaded entry
+methods. In the standard parallel algorithm, the computation proceeds in <code>log2(N)</code> steps;
+in step <code>k</code>, element <code>i</code> (for <code>i &gt;= 2^k</code>) adds the value from element <code>i - 2^k</code>. Use a
+<code>CkFuture</code> (or <code>[sync]</code> method) for each inter-element fetch. The result at element <code>i</code>
+after all steps should be the sum of the original values at indices 0 through <code>i</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ch5_load_balancing/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 5 — Load Balancing">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 5 — Load Balancing
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1297 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch2_basic_chares/">
+      
+      
+        <link rel="prev" href="../ch1_introduction/">
+      
+      
+        <link rel="next" href="../ch3_sdag/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 2 — Basic Chares - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-2-simple-programs-and-basic-chares" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 2 — Basic Chares
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch1_introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chares-parallel-c-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chares: Parallel C++ Objects
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello World
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hello World">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-interface-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Interface File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-implementation-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Implementation File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build and Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-multiple-chares" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating Multiple Chares
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proxies-and-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proxies and Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-order-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out-of-Order Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing-arrays-to-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Passing Arrays to Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grainsize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grainsize
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Grainsize">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#measured-example-primality-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Example: Primality Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grainsize-and-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grainsize and Parallelism
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch3_sdag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch4_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_threaded/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chares-parallel-c-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chares: Parallel C++ Objects
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hello-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hello World
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hello World">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-interface-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Interface File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-implementation-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Implementation File
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build and Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-multiple-chares" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Creating Multiple Chares
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proxies-and-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proxies and Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-order-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out-of-Order Execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing-arrays-to-entry-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Passing Arrays to Entry Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grainsize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grainsize
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Grainsize">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#measured-example-primality-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured Example: Primality Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grainsize-and-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grainsize and Parallelism
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#system-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-2-simple-programs-and-basic-chares">Chapter 2: Simple Programs and Basic Chares<a class="headerlink" href="#chapter-2-simple-programs-and-basic-chares" title="Permanent link">&para;</a></h1>
+<p>Charm++ programs are written in standard C++. To support parallel features, Charm++
+requires a small amount of additional information about which objects are parallel and which
+of their methods can be invoked remotely. This information is provided in an <strong>interface
+file</strong> with the extension <code>.ci</code>.</p>
+<p>Every Charm++ program therefore involves (at minimum) two source files:</p>
+<ul>
+<li>A <code>.ci</code> file declaring the parallel structure</li>
+<li>A <code>.C</code> (or <code>.cpp</code>) file containing the C++ implementation</li>
+</ul>
+<p>The Charm++ compiler, <code>charmc</code>, processes the <code>.ci</code> file to generate two header files
+(<code>&lt;module&gt;.decl.h</code> and <code>&lt;module&gt;.def.h</code>) that are included in the <code>.C</code> file.</p>
+<hr />
+<h2 id="chares-parallel-c-objects">Chares: Parallel C++ Objects<a class="headerlink" href="#chares-parallel-c-objects" title="Permanent link">&para;</a></h2>
+<p>A <strong>chare</strong> is a C++ object with three special properties:</p>
+<ol>
+<li>It inherits from a system-generated base class (<code>CBase_ClassName</code>).</li>
+<li>It can be created on any processor — the creator does not choose which one.</li>
+<li>Some of its methods, called <strong>entry methods</strong>, can be invoked asynchronously from
+   any other processor.</li>
+</ol>
+<p>Everything else about a chare is ordinary C++: it has data members, private methods,
+constructors, and so on. The parallel machinery is layered on top of normal C++ objects,
+not in place of them.</p>
+<hr />
+<h2 id="hello-world">Hello World<a class="headerlink" href="#hello-world" title="Permanent link">&para;</a></h2>
+<p>The simplest Charm++ program has a single chare — the <strong>main chare</strong> — whose
+constructor is the program entry point, analogous to <code>main()</code> in sequential C.</p>
+<h3 id="the-interface-file">The Interface File<a class="headerlink" href="#the-interface-file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// hello.ci</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">mainmodule</span><span class="w"> </span><span class="n">hello</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">mainchare</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">);</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">};</span>
+</code></pre></div>
+<p>Several things to note:</p>
+<ul>
+<li>Every Charm++ program is organized into <strong>modules</strong>. Each module has one <code>.ci</code> file.
+  Exactly one module is the <code>mainmodule</code>.</li>
+<li>The <code>mainchare</code> keyword designates the class whose constructor starts execution.</li>
+<li>The constructor is declared as an <code>entry</code> method. Any method that can be invoked
+  remotely — including all constructors of chare classes — must be declared as <code>entry</code>
+  in the <code>.ci</code> file.</li>
+<li><code>CkArgMsg</code> is a system class carrying <code>argc</code> and <code>argv</code>. All main chares receive it.</li>
+</ul>
+<h3 id="the-implementation-file">The Implementation File<a class="headerlink" href="#the-implementation-file" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// hello.C</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;hello.decl.h&quot;</span><span class="c1">      // generated by charmc from hello.ci</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="n">main</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w">   </span><span class="c1">// required for migratability</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Hello World</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">};</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;hello.def.h&quot;</span><span class="c1">       // generated by charmc from hello.ci</span>
+</code></pre></div>
+<p>Key points:</p>
+<ul>
+<li><code>CBase_main</code> is generated by <code>charmc</code> from the <code>.ci</code> declaration. Inheriting from it
+  makes <code>main</code> a proper chare class.</li>
+<li><code>hello.decl.h</code> is included at the <strong>top</strong> of the file (before the class definition).
+  <code>hello.def.h</code> is included at the <strong>bottom</strong> (after all class definitions).</li>
+<li><code>CkPrintf</code> is the Charm++ replacement for <code>printf</code>. It buffers output so that lines
+  from different processors do not interleave. <code>ckout</code> provides the same guarantee
+  for <code>iostream</code>-style output.</li>
+<li><code>CkExit()</code> — not <code>exit()</code> — shuts down all processors cleanly. Calling <code>exit()</code>
+  directly would leave other processors hanging.</li>
+</ul>
+<h3 id="build-and-run">Build and Run<a class="headerlink" href="#build-and-run" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>charmc<span class="w"> </span>hello.ci<span class="w">                         </span><span class="c1"># generates hello.decl.h and hello.def.h</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>charmc<span class="w"> </span>-c<span class="w"> </span>hello.C<span class="w">                       </span><span class="c1"># compiles</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>charmc<span class="w"> </span>-language<span class="w"> </span>charm++<span class="w"> </span>-o<span class="w"> </span>hello<span class="w"> </span>hello.o<span class="w">  </span><span class="c1"># links</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>./hello<span class="w"> </span>+p1<span class="w">                             </span><span class="c1"># run on 1 PE (no charmrun needed for single process)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>./hello<span class="w"> </span>+p4<span class="w">          </span><span class="c1"># run on 4 PEs on local machine</span>
+</code></pre></div>
+<p>The <code>+pN</code> flag tells Charm++ to use N processing elements (PEs). On a single machine,
+<code>++local</code> avoids the need for <code>ssh</code>.</p>
+<hr />
+<h2 id="creating-multiple-chares">Creating Multiple Chares<a class="headerlink" href="#creating-multiple-chares" title="Permanent link">&para;</a></h2>
+<p>A single chare uses only one PE. To use multiple processors, the program must create
+multiple chares so the runtime can distribute them across PEs.</p>
+<p>The main chare always creates the first wave of work. Those chares may create further
+chares, and so on.</p>
+<p>To create a new chare, use the <code>ckNew</code> static method of its <strong>proxy class</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// In the .ci file:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">chare</span><span class="w"> </span><span class="n">Interim</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="nf">Interim</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">);</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">};</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">// In the .C file:</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">CProxy_Interim</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span><span class="w">   </span><span class="c1">// create an Interim chare with argument 42</span>
+</code></pre></div>
+<p><code>ckNew</code> is <strong>non-blocking</strong>. It tells the runtime to create the chare on some processor
+of its choice, then immediately returns. The actual construction happens asynchronously.</p>
+<p>For every chare class <code>Foo</code> declared in the <code>.ci</code> file, <code>charmc</code> generates a proxy class
+<code>CProxy_Foo</code>. Proxies are location-oblivious handles to chares — they work correctly
+regardless of which processor the chare lives on, and even if the chare migrates.</p>
+<hr />
+<h2 id="proxies-and-entry-methods">Proxies and Entry Methods<a class="headerlink" href="#proxies-and-entry-methods" title="Permanent link">&para;</a></h2>
+<p>Creating a chare with <code>ckNew</code> returns a proxy to it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">CProxy_Compute</span><span class="w"> </span><span class="n">sim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Compute</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">pi</span><span class="p">);</span>
+</code></pre></div>
+<p>You can then invoke entry methods on the chare through its proxy:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">sim</span><span class="p">.</span><span class="n">findArea</span><span class="p">(</span><span class="mf">5.0</span><span class="p">);</span><span class="w">    </span><span class="c1">// non-blocking: enqueues the call on sim&#39;s processor</span>
+</code></pre></div>
+<p>This looks like a regular method call but behaves very differently:
+- The parameters are <strong>packed into a message</strong> by the runtime.
+- The message is sent to whatever processor currently holds <code>sim</code>.
+- Control <strong>returns immediately</strong> to the caller.
+- At some future time, <code>sim</code>'s scheduler picks up the message and invokes <code>findArea</code>.</p>
+<p>Entry methods must be declared in the <code>.ci</code> file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">chare</span><span class="w"> </span><span class="n">Compute</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="nf">Compute</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">pi</span><span class="p">);</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">findArea</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">radius</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">done</span><span class="p">);</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">};</span>
+</code></pre></div>
+<p>Every chare also has <code>thisProxy</code> — a proxy to itself, inherited from <code>CBase_*</code>. This
+is how a chare passes a reference to itself to others:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">CProxy_Compute</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span><span class="w"> </span><span class="n">thisProxy</span><span class="p">);</span><span class="w">   </span><span class="c1">// pass self-reference to new chare</span>
+</code></pre></div>
+<hr />
+<h2 id="out-of-order-execution">Out-of-Order Execution<a class="headerlink" href="#out-of-order-execution" title="Permanent link">&para;</a></h2>
+<p>Charm++ does <strong>not</strong> guarantee that entry method invocations are delivered in the order
+they were sent. This surprises programmers coming from sequential or MPI backgrounds.</p>
+<p>Consider:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">sim</span><span class="p">.</span><span class="n">findArea</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">sim</span><span class="p">.</span><span class="n">findArea</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="cm">/*done=*/</span><span class="nb">true</span><span class="p">);</span><span class="w">   </span><span class="c1">// wrong: this may arrive first</span>
+</code></pre></div>
+<p>The <code>done=true</code> invocation may reach <code>sim</code> before some earlier ones, causing premature
+termination.</p>
+<p>There are two reasons Charm++ does not enforce ordering:
+1. Guaranteeing order has a cost (sequence numbers, buffering). The base model avoids
+   paying that cost unless necessary.
+2. The scheduler may deliberately reorder messages — for example, to execute
+   high-priority messages first.</p>
+<p>The correct approach is to think <strong>asynchronously</strong> and design programs that work
+regardless of delivery order. A standard pattern: count callbacks.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Main chare sends 10 findArea requests and waits for 10 responses:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="n">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">CProxy_Compute</span><span class="w"> </span><span class="n">sim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Compute</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span><span class="w"> </span><span class="n">thisProxy</span><span class="p">);</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">sim</span><span class="p">.</span><span class="n">findArea</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">doneArea</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="c1">// entry method called by Compute for each result</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">--</span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">CkExit</span><span class="p">();</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">};</span>
+</code></pre></div>
+<p>Now termination is correct regardless of delivery order: <code>CkExit</code> fires only after all
+10 responses arrive.</p>
+<p>Note: a chare's own <strong>private methods</strong> (not declared <code>entry</code>) are called directly and
+execute synchronously, like ordinary C++. An entry method called via <code>thisProxy.foo()</code>
+is enqueued in the scheduler and executes later; the same method called as <code>foo()</code> or
+<code>this-&gt;foo()</code> executes immediately.</p>
+<hr />
+<h2 id="passing-arrays-to-entry-methods">Passing Arrays to Entry Methods<a class="headerlink" href="#passing-arrays-to-entry-methods" title="Permanent link">&para;</a></h2>
+<p>Entry methods can receive arrays. The size parameter must appear before the array in
+the <code>.ci</code> declaration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// .ci file</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">process</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">]);</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// .C file — receiving side</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">}</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1">// sending side</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="kt">double</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">proxy</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">);</span><span class="w">    </span><span class="c1">// runtime packs the array into the message</span>
+</code></pre></div>
+<p>The runtime handles packing and unpacking. The receiving pointer is valid only for
+the duration of the entry method.</p>
+<hr />
+<h2 id="grainsize">Grainsize<a class="headerlink" href="#grainsize" title="Permanent link">&para;</a></h2>
+<p>A key question in any Charm++ program is: how many chares, and how much work per
+chare? This is the <strong>grainsize</strong> question.</p>
+<p>Define:
+- <em>g</em> — computation time of one entry method invocation (the grain)
+- <em>t_o</em> — per-grain overhead (scheduling, message packing/unpacking): typically 1–5 µs</p>
+<p>On one processor, total execution time is:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>T₁ = T + t_o · (T/g)
+</code></pre></div>
+<p>where <em>T</em> is the sequential execution time. The overhead term is small when <em>g &gt;&gt; t_o</em>.
+A practical rule: keep <em>g</em> at least 10–20× <em>t_o</em>.</p>
+<p>On P processors (assuming good load balance):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Tp ≈ max(g, T₁/P)
+</code></pre></div>
+<p>The max term captures Amdahl's law: you cannot run faster than the largest grain.</p>
+<h3 id="measured-example-primality-testing">Measured Example: Primality Testing<a class="headerlink" href="#measured-example-primality-testing" title="Permanent link">&para;</a></h3>
+<p>Testing primality of 1 million random integers, varying the number of integers per chare
+(batch size M), on a single PE:</p>
+<table>
+<thead>
+<tr>
+<th>M (numbers/chare)</th>
+<th>Chares</th>
+<th>Time (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1,000,000</td>
+<td>2.29</td>
+</tr>
+<tr>
+<td>10</td>
+<td>100,000</td>
+<td>1.29</td>
+</tr>
+<tr>
+<td>20</td>
+<td>50,000</td>
+<td>1.23</td>
+</tr>
+<tr>
+<td>50</td>
+<td>20,000</td>
+<td>1.21</td>
+</tr>
+<tr>
+<td>100</td>
+<td>10,000</td>
+<td>1.19</td>
+</tr>
+<tr>
+<td>1,000,000</td>
+<td>1 (sequential)</td>
+<td>1.19</td>
+</tr>
+</tbody>
+</table>
+<p>Per-chare overhead measured at ~1.1 µs. With ~1.2 µs of computation per number,
+the grain needs to be only ~20 numbers (M ≈ 20) to bring overhead below 5% of
+sequential time. Beyond that, the curve is essentially flat — a wide range of grainsizes
+all perform near-optimally.</p>
+<p><strong>Key insight</strong>: the flat region is wide. There is no need to find a precise optimal
+grainsize. Choose a grain large enough to amortize overhead, and the runtime does the
+rest.</p>
+<blockquote>
+<p><strong>Note on measurement</strong>: these timings were collected by running the program directly
+(without <code>charmrun</code>) on a single PE. When using <code>charmrun</code> with SMP mode, inter-process
+communication machinery adds per-message overhead even on a single logical PE,
+artificially inflating the measured overhead and introducing noise. For grainsize
+experiments, run directly.</p>
+</blockquote>
+<h3 id="grainsize-and-parallelism">Grainsize and Parallelism<a class="headerlink" href="#grainsize-and-parallelism" title="Permanent link">&para;</a></h3>
+<p>On multiple PEs, the optimal grainsize shifts. With 4 PEs, a finer decomposition
+(more chares) allows the runtime more flexibility to overlap work and communication.
+In the primality example, the 4-PE optimum was around M = 10,000 — coarser than
+strictly necessary for overhead, but fine enough to give the runtime 100 chares to
+schedule. The general guideline: aim for at least 4–10× more chares than PEs.</p>
+<hr />
+<h2 id="system-utilities">System Utilities<a class="headerlink" href="#system-utilities" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Utility</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CkPrintf(fmt, ...)</code></td>
+<td>Thread-safe printf</td>
+</tr>
+<tr>
+<td><code>ckout &lt;&lt; ...</code></td>
+<td>Thread-safe iostream output</td>
+</tr>
+<tr>
+<td><code>CkExit()</code></td>
+<td>Terminate all PEs cleanly</td>
+</tr>
+<tr>
+<td><code>CkAbort(msg)</code></td>
+<td>Abort with error message</td>
+</tr>
+<tr>
+<td><code>CkMyPe()</code></td>
+<td>Index of the current PE</td>
+</tr>
+<tr>
+<td><code>CkNumPes()</code></td>
+<td>Total number of PEs</td>
+</tr>
+<tr>
+<td><code>CkWallTimer()</code></td>
+<td>Wall-clock time in seconds (double)</td>
+</tr>
+<tr>
+<td><code>CkArgMsg</code></td>
+<td>Carries argc/argv to the main chare</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>The structure of a Charm++ program:</p>
+<ol>
+<li><strong><code>.ci</code> file</strong>: declare modules, chare classes, and entry methods.</li>
+<li><strong><code>charmc hello.ci</code></strong>: generates <code>hello.decl.h</code> and <code>hello.def.h</code>.</li>
+<li><strong><code>.C</code> file</strong>: implement chare classes, bracketed by <code>#include "hello.decl.h"</code> and
+   <code>#include "hello.def.h"</code>.</li>
+<li><strong>Create chares</strong> with <code>CProxy_Foo::ckNew(args)</code> — returns a proxy, creation is
+   asynchronous.</li>
+<li><strong>Invoke entry methods</strong> via proxy — non-blocking, may execute out of order.</li>
+<li><strong>Terminate</strong> with <code>CkExit()</code> from the last entry method that should run.</li>
+</ol>
+<p>The most important habit to develop: think asynchronously. Design programs that are
+correct regardless of message delivery order. The callback-counting pattern shown above
+is a fundamental building block.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ch1_introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 1 — Introduction">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 1 — Introduction
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../ch3_sdag/" class="md-footer__link md-footer__link--next" aria-label="Next: Chapter 3 — Structured Dagger">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Chapter 3 — Structured Dagger
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

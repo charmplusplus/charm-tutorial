@@ -1,0 +1,1514 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A hands-on introduction to parallel programming with Charm++">
+      
+      
+        <meta name="author" content="Laxmikant V. Kale">
+      
+      
+        <link rel="canonical" href="https://charmplusplus.org/charm-tutorial/ch3_sdag/">
+      
+      
+        <link rel="prev" href="../ch2_basic_chares/">
+      
+      
+        <link rel="next" href="../exercise_dht/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Chapter 3 — Structured Dagger - Charm++ Tutorial</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chapter-3-structured-dagger-sdag" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Charm++ Tutorial" class="md-header__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Charm++ Tutorial
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chapter 3 — Structured Dagger
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Charm++ Tutorial" class="md-nav__button md-logo" aria-label="Charm++ Tutorial" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Charm++ Tutorial
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch1_introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 1 — Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch2_basic_chares/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 2 — Basic Chares
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 3 — Structured Dagger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-minimal-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Minimal Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serial-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        serial Blocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-clauses-and-buffering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        when Clauses and Buffering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-for-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG for Loops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG if
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-classname_sdag_code-macro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ClassName_SDAG_CODE Macro
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-parallel-prefix-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example: Parallel Prefix Sum
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-and-after-odd-even-transposition-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before and After: Odd-Even Transposition Sort
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise-choose-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercise: Choose One
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exercise: Choose One">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-parallel-prefix-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Parallel Prefix Sum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-odd-even-transposition-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Odd-Even Transposition Sort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-exercise-k-means-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Exercise: K-Means Clustering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-and-the-chare-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG and the Chare Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-constructs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Constructs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exercise_dht/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exercise — DHT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch4_pup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 4 — PUP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch5_load_balancing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 5 — Load Balancing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ch6_threaded/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chapter 6 — Threaded Methods
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-minimal-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A Minimal Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serial-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        serial Blocks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-clauses-and-buffering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        when Clauses and Buffering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-for-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG for Loops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG if
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-classname_sdag_code-macro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ClassName_SDAG_CODE Macro
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-parallel-prefix-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example: Parallel Prefix Sum
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-and-after-odd-even-transposition-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before and After: Odd-Even Transposition Sort
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exercise-choose-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exercise: Choose One
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exercise: Choose One">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-parallel-prefix-sum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Parallel Prefix Sum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-odd-even-transposition-sort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Odd-Even Transposition Sort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-exercise-k-means-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Exercise: K-Means Clustering
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdag-and-the-chare-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDAG and the Chare Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-constructs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Constructs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="chapter-3-structured-dagger-sdag">Chapter 3: Structured Dagger (SDAG)<a class="headerlink" href="#chapter-3-structured-dagger-sdag" title="Permanent link">&para;</a></h1>
+<p>The programs you wrote in the previous exercises — parallel prefix sum and odd-even
+transposition sort — are correct, but they share an uncomfortable structural property.
+The logic of each chare is fundamentally sequential: "first do step 1, then wait for a
+message, then do step 2, ..." Yet the code does not look sequential at all. It is
+spread across a constructor, a private <code>advance()</code> method, and a <code>receiveVal</code> entry
+method, with a message buffer and a flag or two to stitch them together. Every time
+the runtime delivers a message, <code>receiveVal</code> figures out what state the chare is in,
+applies the received value, and re-enters <code>advance()</code> to push the chare forward.</p>
+<p>The code works, but reasoning about it requires holding the entire state machine in your
+head simultaneously. If you wanted to add a third phase, you would need to extend the
+buffer, add another flag, and add another case to <code>advance()</code>.</p>
+<p><strong>Structured Dagger (SDAG)</strong> is a Charm++ extension that lets you write the chare's
+lifecycle as a sequential program — one that can block waiting for a message, then
+resume. The underlying execution model is unchanged (messages still arrive in any order,
+the scheduler still runs other chares while a chare is "blocked"), but the code reads
+like a straight-line program.</p>
+<hr />
+<h2 id="the-idea">The Idea<a class="headerlink" href="#the-idea" title="Permanent link">&para;</a></h2>
+<p>In SDAG, the body of certain entry methods is written directly in the <code>.ci</code> file, not
+in the <code>.C</code> file. The Charm++ interface compiler (<code>charmc</code>) translates those bodies into
+a state machine — but you never see the state machine. You see the sequential version.</p>
+<p>Two constructs do the work:</p>
+<ul>
+<li>
+<p><strong><code>serial { ... }</code></strong> — a block of ordinary C++ code. The scheduler cannot interrupt
+  execution inside a serial block; from the chare's point of view, it runs atomically.</p>
+</li>
+<li>
+<p><strong><code>when method(args) serial { ... }</code></strong> — a blocking receive. Execution suspends here
+  until an invocation of <code>method</code> on this chare arrives. When it does, the body runs.
+  If the message has already arrived before <code>when</code> is reached, it is consumed immediately
+  without suspending.</p>
+</li>
+</ul>
+<p>The SDAG runtime buffers messages that arrive before a <code>when</code> is ready to consume them.
+You do not manage the buffer; you just write <code>when</code>.</p>
+<hr />
+<h2 id="a-minimal-example">A Minimal Example<a class="headerlink" href="#a-minimal-example" title="Permanent link">&para;</a></h2>
+<p>Here is the simplest use of SDAG: a chare that sends a value to another chare and then
+waits for a reply before printing.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// .ci file</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Ping</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="nf">Ping</span><span class="p">();</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">reply</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="n">pongArray</span><span class="p">[</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mi">1</span><span class="p">].</span><span class="n">ping</span><span class="p">(</span><span class="n">myVal</span><span class="p">);</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">when</span><span class="w"> </span><span class="n">reply</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;[%d] received %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="n">contribute</span><span class="p">(</span><span class="n">CkCallback</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">));</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">};</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// .C file</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">Ping</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Ping</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">myVal</span><span class="p">;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="n">Ping_SDAG_CODE</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">Ping</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">myVal</span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="n">Ping</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">};</span>
+</code></pre></div>
+<p>The <code>.ci</code> body of <code>start()</code> reads like a sequential program. The <code>when reply(...)</code> line
+blocks until the other chare sends a <code>reply</code> message. Everything after it runs in order.</p>
+<hr />
+<h2 id="serial-blocks"><code>serial</code> Blocks<a class="headerlink" href="#serial-blocks" title="Permanent link">&para;</a></h2>
+<p>A <code>serial</code> block is arbitrary C++. It can call any function, modify member variables,
+send messages to other chares, or call Charm++ utilities:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">compute</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="n">otherProxy</span><span class="p">.</span><span class="n">sendData</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;[%d] value is now %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
+</code></pre></div>
+<p>Within a <code>serial</code> block the scheduler cannot deliver any other message to this PE.
+The block should therefore be short — it is not a place for long computation. Long
+computation in a serial block stalls all other chares on the same PE.</p>
+<hr />
+<h2 id="when-clauses-and-buffering"><code>when</code> Clauses and Buffering<a class="headerlink" href="#when-clauses-and-buffering" title="Permanent link">&para;</a></h2>
+<p>A <code>when</code> clause designates an entry method as the source of the next expected message:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">when</span><span class="w"> </span><span class="nf">receiveData</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>If the message has not arrived yet, the Charm++ runtime returns this chare's thread
+to the scheduler and resumes it when the message arrives. Any other chares on this PE
+continue to run normally.</p>
+<p>If the message has already arrived (because the sender was fast), <code>when</code> finds it in
+the runtime's buffer and proceeds without suspending. Either way, from the chare's
+perspective, <code>when</code> simply blocks and then continues.</p>
+<p>A crucial consequence: <strong>the order of <code>when</code> clauses in the <code>.ci</code> body defines the
+order in which messages are consumed</strong>, regardless of the order they arrive. The runtime
+buffers all early arrivals. This is the SDAG replacement for the manual message-buffer
+map (<code>std::map&lt;int,int&gt; recvBuf</code>) you wrote in the prefix sum.</p>
+<hr />
+<h2 id="reference-numbers">Reference Numbers<a class="headerlink" href="#reference-numbers" title="Permanent link">&para;</a></h2>
+<p>The buffering just described handles a single <code>when</code> per entry method cleanly, but what
+about a loop that receives many messages of the same type, one per iteration?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// naive — WRONG in a loop</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">round</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">neighbor</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">round</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>The problem: all arriving <code>update</code> messages go into the same pool. When the <code>when</code> in
+round 0 fires, it might consume a message from round 5. The result is incorrect.</p>
+<p>SDAG solves this with <strong>reference numbers</strong>. The first <code>int</code> parameter of an entry
+method is its implicit reference number. When you write <code>when update[round](...)</code>, the
+<code>when</code> only matches a message whose first argument equals the current value of <code>round</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">round</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span><span class="w">   </span><span class="c1">// &#39;round&#39; is the reference number</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// correct — with reference numbers</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">round</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">neighbor</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">round</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="n">update</span><span class="p">[</span><span class="n">round</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>Now <code>when update[round]</code> in iteration 3 will only consume an <code>update</code> message whose
+first argument is 3. Messages from future rounds (round = 5, 7, ...) are buffered by
+the SDAG runtime and delivered when the loop reaches those iterations. You no longer
+need a buffer, flags, or a re-entrant <code>advance()</code>.</p>
+<p>This is the mechanism that replaces the entire <code>bufRound</code>/<code>bufVal</code> scalar buffer from
+the odd-even sort, and the <code>recvBuf</code> map from the prefix sum.</p>
+<hr />
+<h2 id="sdag-for-loops">SDAG <code>for</code> Loops<a class="headerlink" href="#sdag-for-loops" title="Permanent link">&para;</a></h2>
+<p>SDAG supports <code>for</code>, <code>while</code>, and <code>if</code> constructs inside entry method bodies. The <code>for</code>
+loop follows C++ syntax, but with one constraint: <strong>the loop variable must be a class
+member</strong>, not declared in the loop header. This is because the SDAG compiler needs to
+store the variable between suspension points.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// .ci</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElements</span><span class="p">;</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;&lt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="n">when</span><span class="w"> </span><span class="n">recv</span><span class="p">[</span><span class="n">dist</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">ref</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">};</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="c1">// .C — dist must be a member variable</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">class</span><span class="w"> </span><span class="nc">Foo</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Foo</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">dist</span><span class="p">;</span><span class="w">   </span><span class="c1">// loop variable must be a member</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">};</span>
+</code></pre></div>
+<p>Any combination of <code>serial</code>, <code>when</code>, and <code>if</code> blocks can appear inside the loop body.
+Iterations run sequentially: the body of iteration k completes (including any <code>when</code>
+suspensions) before iteration k+1 begins. This is correct for algorithms like prefix
+sum and odd-even sort, where each step depends on the previous one.</p>
+<hr />
+<h2 id="sdag-if">SDAG <code>if</code><a class="headerlink" href="#sdag-if" title="Permanent link">&para;</a></h2>
+<p>SDAG <code>if</code> works exactly as you expect. It can gate <code>serial</code> blocks, <code>when</code> clauses, or
+nested constructs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElements</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">otherProxy</span><span class="p">[</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dist</span><span class="p">].</span><span class="n">send</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">dist</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="n">recv</span><span class="p">[</span><span class="n">dist</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">ref</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<p>If the condition references values computed in a preceding <code>serial</code> block, those values
+must be stored in member variables (not local variables) so the SDAG compiler can access
+them across suspension points. For example, in odd-even sort, <code>amLeft</code> and <code>amRight</code> are
+set in a <code>serial</code> block and then used in the <code>if</code> condition that gates the <code>when</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// .ci</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">round</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElems</span><span class="p">;</span><span class="w"> </span><span class="n">round</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">round</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">amLeft</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">offset</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElems</span><span class="p">);</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">amRight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">offset</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="c1">// ... send if active ...</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">amLeft</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">amRight</span><span class="p">)</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="n">when</span><span class="w"> </span><span class="n">receiveVal</span><span class="p">[</span><span class="n">round</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">partnerVal</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">amLeft</span><span class="p">)</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">partnerVal</span><span class="p">);</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">      </span><span class="k">else</span><span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">partnerVal</span><span class="p">);</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="p">}</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1">// .C — amLeft and amRight must be members</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="k">class</span><span class="w"> </span><span class="nc">Sorter</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Sorter</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">;</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">amLeft</span><span class="p">,</span><span class="w"> </span><span class="n">amRight</span><span class="p">;</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">  </span><span class="p">...</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="p">};</span>
+</code></pre></div>
+<p>IDLE elements — those where both <code>amLeft</code> and <code>amRight</code> are false — skip the <code>when</code>
+entirely for that round. The loop counter increments and the chare continues to the
+next round without waiting for any message. No special handling is required; the <code>if</code>
+does the right thing.</p>
+<hr />
+<h2 id="the-classname_sdag_code-macro">The <code>ClassName_SDAG_CODE</code> Macro<a class="headerlink" href="#the-classname_sdag_code-macro" title="Permanent link">&para;</a></h2>
+<p>Any chare class that contains SDAG code must include the macro <code>ClassName_SDAG_CODE</code>
+inside its class body:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Prefix</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Prefix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="n">Prefix_SDAG_CODE</span><span class="w">   </span><span class="c1">// required — generates entry points and scheduler hooks</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="n">Prefix</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="n">Prefix</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">};</span>
+</code></pre></div>
+<p>The macro is generated by <code>charmc</code> from the <code>.ci</code> file. It inserts the internal
+machinery that implements the <code>when</code> buffering and the suspension/resume mechanism.
+Omitting it causes a compile error. There is nothing else to do; the macro takes care
+of everything.</p>
+<hr />
+<h2 id="complete-example-parallel-prefix-sum">Complete Example: Parallel Prefix Sum<a class="headerlink" href="#complete-example-parallel-prefix-sum" title="Permanent link">&para;</a></h2>
+<p>The SDAG version of the parallel prefix sum lives in <code>examples/prefix_sdag/</code>. Here is
+the <code>.ci</code> file in full, with annotations.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">mainmodule</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="n">readonly</span><span class="w"> </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="n">readonly</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numElements</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="n">readonly</span><span class="w"> </span><span class="n">CProxy_Prefix</span><span class="w"> </span><span class="n">prefixArray</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">mainchare</span><span class="w"> </span><span class="n">Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="o">*</span><span class="p">);</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="p">[</span><span class="n">reductiontarget</span><span class="p">]</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">done</span><span class="p">();</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">  </span><span class="n">array</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="n">D</span><span class="p">]</span><span class="w"> </span><span class="n">Prefix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="nf">Prefix</span><span class="p">();</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">passValue</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">stepDist</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">);</span><span class="w">  </span><span class="c1">// (1)</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">    </span><span class="n">entry</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">                           </span><span class="c1">// (2)</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElements</span><span class="p">;</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;&lt;=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// (3)</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numElements</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w">      </span><span class="c1">// (4)</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">          </span><span class="n">usleep</span><span class="p">(</span><span class="n">rand</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">5001</span><span class="p">);</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">          </span><span class="n">prefixArray</span><span class="p">[</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dist</span><span class="p">].</span><span class="n">passValue</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">dist</span><span class="p">)</span><span class="w">                            </span><span class="c1">// (5)</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">          </span><span class="n">when</span><span class="w"> </span><span class="n">passValue</span><span class="p">[</span><span class="n">dist</span><span class="p">](</span><span class="kt">int</span><span class="w"> </span><span class="n">stepDist</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// (6)</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">            </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="w">      </span><span class="n">serial</span><span class="w"> </span><span class="p">{</span><span class="w">                                             </span><span class="c1">// (7)</span>
+<a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="w">        </span><span class="n">CkPrintf</span><span class="p">(</span><span class="s">&quot;Prefix[%d] = %d  (expected %d)  %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a><span class="w">                 </span><span class="n">thisIndex</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="p">,</span>
+<a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a><span class="w">                 </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">expected</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;OK&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;WRONG&quot;</span><span class="p">);</span>
+<a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a><span class="w">        </span><span class="n">CkCallback</span><span class="w"> </span><span class="nf">cb</span><span class="p">(</span><span class="n">CkReductionTarget</span><span class="p">(</span><span class="n">Main</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="p">),</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">);</span>
+<a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a><span class="w">        </span><span class="n">contribute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">CkReduction</span><span class="o">::</span><span class="n">nop</span><span class="p">,</span><span class="w"> </span><span class="n">cb</span><span class="p">);</span>
+<a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a><span class="w">    </span><span class="p">};</span>
+<a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a><span class="w">  </span><span class="p">};</span>
+<a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a><span class="p">};</span>
+</code></pre></div>
+<p><strong>(1)</strong> <code>passValue(int stepDist, int val)</code> — the first parameter is <code>int</code>, so
+<code>stepDist</code> is the reference number. When this chare sends
+<code>prefixArray[i].passValue(dist, value)</code>, the message is tagged with the value <code>dist</code>.</p>
+<p><strong>(2)</strong> <code>start()</code> is an SDAG entry method — its body is written here in the <code>.ci</code> file.
+<code>Main</code> calls <code>prefixArray.start()</code> to kick off the algorithm.</p>
+<p><strong>(3)</strong> The loop variable <code>dist</code> is a class member. The step <code>dist &lt;&lt;= 1</code> doubles
+the stride each iteration, giving the log(N) steps of recursive doubling.</p>
+<p><strong>(4)</strong> The right-neighbor send. The <code>if</code> condition ensures element N-1 does not try
+to send out of bounds. The <code>serial</code> block includes a random delay (<code>usleep</code>) to stress-
+test that out-of-order delivery is handled correctly.</p>
+<p><strong>(5)</strong> The left-neighbor receive. Elements with no left neighbor at this step (those
+with <code>thisIndex &lt; dist</code>) skip the <code>when</code> entirely.</p>
+<p><strong>(6)</strong> <code>when passValue[dist]</code> — the <code>[dist]</code> tag means: match only a <code>passValue</code>
+message whose first argument equals the current value of <code>dist</code>. Messages arriving early
+(from a larger step) are held in the SDAG buffer until the loop reaches the matching
+iteration.</p>
+<p><strong>(7)</strong> After all steps complete, every element has its prefix sum. Print and contribute
+to a no-op reduction to signal <code>Main</code> that the algorithm is finished.</p>
+<p>The corresponding <code>.C</code> file is remarkably thin:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;prefix.decl.h&quot;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="n">CProxy_Main</span><span class="w"> </span><span class="n">mainProxy</span><span class="p">;</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="n">CProxy_Prefix</span><span class="w"> </span><span class="n">prefixArray</span><span class="p">;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="cm">/*readonly*/</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numElements</span><span class="p">;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="k">class</span><span class="w"> </span><span class="nc">Main</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Main</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="n">Main</span><span class="p">(</span><span class="n">CkArgMsg</span><span class="o">*</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">        </span><span class="n">numElements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">argc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">        </span><span class="k">delete</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">        </span><span class="n">mainProxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thisProxy</span><span class="p">;</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">        </span><span class="n">prefixArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CProxy_Prefix</span><span class="o">::</span><span class="n">ckNew</span><span class="p">(</span><span class="n">numElements</span><span class="p">);</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">        </span><span class="n">prefixArray</span><span class="p">.</span><span class="n">start</span><span class="p">();</span><span class="w">    </span><span class="c1">// kick off the SDAG entry method</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">done</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CkExit</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="p">};</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="k">class</span><span class="w"> </span><span class="nc">Prefix</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">CBase_Prefix</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="p">;</span><span class="w">    </span><span class="c1">// dist is the SDAG for-loop variable; must be a member</span>
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">    </span><span class="n">Prefix_SDAG_CODE</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">    </span><span class="n">Prefix</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">dist</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">        </span><span class="n">srand</span><span class="p">(</span><span class="n">thisIndex</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1009</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">7</span><span class="p">);</span>
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">    </span><span class="n">Prefix</span><span class="p">(</span><span class="n">CkMigrateMessage</span><span class="o">*</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="p">};</span>
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;prefix.def.h&quot;</span>
+</code></pre></div>
+<p>Compare this with the manual version in <code>examples/prefix/prefix.C</code>: no <code>recvBuf</code> map,
+no <code>sentAtCurrentDist</code> flag, no <code>isDone</code> guard, no <code>advance()</code> method. The logic has
+moved into the <code>.ci</code> file where it reads sequentially.</p>
+<hr />
+<h2 id="before-and-after-odd-even-transposition-sort">Before and After: Odd-Even Transposition Sort<a class="headerlink" href="#before-and-after-odd-even-transposition-sort" title="Permanent link">&para;</a></h2>
+<p>The cleanup is even more striking for the odd-even sort, where the manual version
+required a carefully-reasoned scalar buffer to prevent deadlock.</p>
+<table>
+<thead>
+<tr>
+<th>Manual (<code>examples/oddevensort/</code>)</th>
+<th>SDAG (<code>examples/oddevensort_sdag/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bufRound</code>, <code>bufVal</code> — one-slot buffer for a future-round message</td>
+<td>automatic — SDAG runtime buffers by reference number</td>
+</tr>
+<tr>
+<td><code>sentRound</code> flag — prevents re-sending on re-entry</td>
+<td>one <code>serial</code> per loop iteration, executes once</td>
+</tr>
+<tr>
+<td><code>advance()</code> — re-entrant, called from constructor and <code>receiveVal</code></td>
+<td>eliminated — <code>start()</code> in the <code>.ci</code> is the control flow</td>
+</tr>
+<tr>
+<td><code>receiveVal(int partnerVal, int r)</code> — splits current/future round handling</td>
+<td><code>receiveVal(int round, int val)</code> — round first, plain receive</td>
+</tr>
+<tr>
+<td>115 lines total</td>
+<td>45 lines total</td>
+</tr>
+</tbody>
+</table>
+<p>In the manual version, the argument to <code>receiveVal</code> was <code>(int val, int round)</code> — value
+first, round second. The SDAG version reverses this to <code>(int round, int val)</code> because
+the reference number mechanism uses the <strong>first</strong> <code>int</code> parameter. This is a mechanical
+consequence of the tagging rule, not an algorithmic change.</p>
+<p>The proof of buffer sufficiency (at most one future-round message can be in flight at
+any time) was necessary to justify the one-slot buffer in the manual version. In the
+SDAG version, that proof is no longer needed: SDAG buffers arbitrarily many early-
+arriving messages. The program is correct for a more general reason.</p>
+<hr />
+<h2 id="exercise-choose-one">Exercise: Choose One<a class="headerlink" href="#exercise-choose-one" title="Permanent link">&para;</a></h2>
+<p>Convert one of your two manual implementations to use SDAG. Both exercises teach the
+same constructs. Choose based on which implementation you found harder to write and
+reason about.</p>
+<h3 id="option-a-parallel-prefix-sum">Option A: Parallel Prefix Sum<a class="headerlink" href="#option-a-parallel-prefix-sum" title="Permanent link">&para;</a></h3>
+<p>Convert <code>examples/prefix/</code> to use SDAG. Start with a new directory so you can compare.</p>
+<p>Key steps:</p>
+<ol>
+<li>Add an <code>entry void start()</code> body to the <code>.ci</code> file.</li>
+<li>Write a <code>for (dist = 1; dist &lt; numElements; dist &lt;&lt;= 1)</code> loop in the body.</li>
+<li>Inside the loop, send to the right neighbor (inside a <code>serial</code> block) and receive
+   from the left neighbor using <code>when passValue[dist](...)</code>.</li>
+<li>After the loop, print the result and call <code>contribute</code> (inside a <code>serial</code> block).</li>
+<li>In the <code>.C</code> file, declare <code>dist</code> as a member variable. Place <code>Prefix_SDAG_CODE</code>
+   in the class body. Have <code>Main</code> call <code>prefixArray.start()</code>.</li>
+<li>Remove <code>advance()</code>, <code>recvBuf</code>, <code>sentAtCurrentDist</code>, and <code>isDone</code>.</li>
+</ol>
+<p>The result should closely resemble Figure 7.3 in the SDAG chapter of the Charm++
+tutorial book.</p>
+<h3 id="option-b-odd-even-transposition-sort">Option B: Odd-Even Transposition Sort<a class="headerlink" href="#option-b-odd-even-transposition-sort" title="Permanent link">&para;</a></h3>
+<p>Convert <code>examples/oddevensort/</code> to use SDAG.</p>
+<p>Key steps:</p>
+<ol>
+<li>Add an <code>entry void start()</code> body to the <code>.ci</code> file.</li>
+<li>Write a <code>for (round = 0; round &lt; numElems; round++)</code> loop.</li>
+<li>Inside the loop, compute <code>amLeft</code> and <code>amRight</code> in a <code>serial</code> block and send
+   if active.</li>
+<li>Gate the <code>when</code> with <code>if (amLeft || amRight)</code>:
+   <code>when receiveVal[round](int r, int partnerVal) serial { ... }</code></li>
+<li>Swap the parameter order in <code>receiveVal</code> to <code>(int round, int val)</code> — round must be
+   first to serve as the reference number.</li>
+<li>Declare <code>round</code>, <code>amLeft</code>, <code>amRight</code> as class members.</li>
+<li>Remove <code>advance()</code>, <code>bufRound</code>, <code>bufVal</code>, <code>sentRound</code>.</li>
+</ol>
+<p>IDLE elements (both <code>amLeft</code> and <code>amRight</code> false) will skip the <code>when</code> via the <code>if</code>
+condition. No special-casing is needed.</p>
+<h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h3>
+<p>Build with <code>make</code> and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>+p4<span class="w"> </span>++ppn<span class="w"> </span><span class="m">2</span><span class="w"> </span>./program<span class="w"> </span><span class="m">8</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>+p4<span class="w"> </span>++ppn<span class="w"> </span><span class="m">2</span><span class="w"> </span>./program<span class="w"> </span><span class="m">16</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>./charmrun<span class="w"> </span>++local<span class="w"> </span>+p2<span class="w"> </span>++ppn<span class="w"> </span><span class="m">2</span><span class="w"> </span>./program<span class="w"> </span><span class="m">8</span>
+</code></pre></div>
+<p>All elements should print <code>OK</code>. The print order will vary between runs (chares complete
+in non-deterministic order), but all values should be correct.</p>
+<hr />
+<h2 id="further-exercise-k-means-clustering">Further Exercise: K-Means Clustering<a class="headerlink" href="#further-exercise-k-means-clustering" title="Permanent link">&para;</a></h2>
+<p>Implement Lloyd's algorithm for K-means clustering as a Charm++ program.</p>
+<p><strong>Setup.</strong> Each of N chares owns a subset of M/N data points in 2D space. The main
+chare holds K cluster centroids (initially chosen at random). Each iteration:</p>
+<ol>
+<li>Main broadcasts the current centroids to all chares.</li>
+<li>Each chare assigns every local point to its nearest centroid, then contributes two
+   reductions back to Main: the per-cluster point count and the per-cluster coordinate
+   sum.</li>
+<li>Main receives both reductions, recomputes the centroids (sum / count), and starts the
+   next iteration if the centroid shift exceeds a convergence threshold.</li>
+</ol>
+<p><strong>Charm++ concepts exercised.</strong> SDAG <code>for</code> loop (or <code>while</code>) for iterations, array
+parameters for broadcasting centroids and receiving partial sums, reductions with custom
+data, and the interaction between broadcasts and reductions within a single iteration.</p>
+<p><strong>Challenge.</strong> A single iteration requires two separate reductions (counts and coordinate
+sums). Think carefully about how Main coordinates receiving both before recomputing
+centroids.</p>
+<p><strong>Parameters.</strong> Accept <code>M</code> (total points), <code>N</code> (number of chares), and <code>K</code> (clusters)
+on the command line. Print the final centroids and the number of iterations to convergence.</p>
+<hr />
+<h2 id="sdag-and-the-chare-lifecycle">SDAG and the Chare Lifecycle<a class="headerlink" href="#sdag-and-the-chare-lifecycle" title="Permanent link">&para;</a></h2>
+<p>A common misconception: SDAG changes the execution model.</p>
+<p>It does not. Messages still arrive in any order. The scheduler still interleaves chares
+on each PE. <code>serial</code> blocks run without interruption, but only within a single block —
+between any two sequential statements that span a <code>when</code>, the scheduler may run any
+number of other chares.</p>
+<p>What SDAG provides is:</p>
+<ol>
+<li><strong>A sequential notation</strong> for control flow that spans multiple message receives.</li>
+<li><strong>A runtime-managed buffer</strong>, keyed by reference number, that holds early-arriving
+   messages until the matching <code>when</code> is ready to consume them.</li>
+</ol>
+<p>The state machine that the manual version forced you to implement by hand is generated
+for you by <code>charmc</code>. You write the sequential intent; the compiler generates the correct
+asynchronous implementation.</p>
+<hr />
+<h2 id="further-constructs">Further Constructs<a class="headerlink" href="#further-constructs" title="Permanent link">&para;</a></h2>
+<p>This chapter covered <code>serial</code>, <code>when</code>, <code>for</code>, and <code>if</code> — sufficient for the exercises
+and for most practical SDAG programs. Three additional constructs exist for more
+complex dependency patterns:</p>
+<ul>
+<li><strong><code>forall [i] (lo:hi, stride) { ... }</code></strong> — iterations that are independent of each
+  other and can execute in any order (though not in parallel).</li>
+<li><strong><code>overlap { ... }</code></strong> — a block containing multiple SDAG statements that may execute
+  in any order; control exits when all of them have completed.</li>
+<li><strong><code>case { when A(...) {...}  when B(...) {...} }</code></strong> — a disjunction: execute whichever
+  branch's message arrives first.</li>
+</ul>
+<p>These are documented in the Charm++ readthedocs manual and in the SDAG chapter of the
+tutorial book.</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>SDAG lets you write the sequential logic of a chare's lifecycle directly in the <code>.ci</code>
+file, using <code>serial</code> and <code>when</code> to express C++ computation and message receives.</p>
+<p>The key points:</p>
+<ol>
+<li><code>serial { ... }</code> — atomic C++ block; the scheduler cannot preempt it.</li>
+<li><code>when method(args) serial { ... }</code> — blocking receive; runtime buffers early arrivals.</li>
+<li><code>when method[ref](int tag, ...)</code> — tagged receive; only matches messages whose first
+   <code>int</code> argument equals <code>ref</code>. Essential for loops with one receive per iteration.</li>
+<li>The <code>for</code> loop variable must be a class member.</li>
+<li><code>if</code> conditions that depend on values set in preceding <code>serial</code> blocks must store
+   those values in member variables.</li>
+<li>Every class with SDAG code must include <code>ClassName_SDAG_CODE</code> in its class body.</li>
+<li>SDAG entry method bodies go in the <code>.ci</code> file; the <code>.C</code> file holds only member
+   declarations and the constructor.</li>
+</ol>
+<p>The underlying execution model is unchanged. SDAG is a notation for expressing
+sequential intent; <code>charmc</code> translates it into correct asynchronous code.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ch2_basic_chares/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Chapter 2 — Basic Chares">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Chapter 2 — Basic Chares
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../exercise_dht/" class="md-footer__link md-footer__link--next" aria-label="Next: Exercise — DHT">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Exercise — DHT
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "content.code.copy", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
