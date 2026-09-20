@@ -1073,7 +1073,8 @@ index creates that element; and <code>doneInserting()</code> tells the runtime t
 complete. <code>insert()</code> can optionally take a PE number as a placement hint.</p>
 <p>Note the bracket form with an explicit <code>CkArrayIndex6D</code>. That is the general way to address
 an element of a chare array. The <code>grid(i, j)</code> form used throughout this tutorial is
-shorthand for <code>grid[CkArrayIndex2D(i, j)]</code>.</p>
+shorthand for <code>grid[CkArrayIndex2D(i, j)]</code>, and it works for insertion too —
+<code>arr(i, j).insert()</code> and <code>arr[CkArrayIndex2D(i, j)].insert()</code> are the same call.</p>
 <h3 id="where-this-matters-leanmd">Where this matters: LeanMD<a class="headerlink" href="#where-this-matters-leanmd" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/UIUC-PPL/leanmd">LeanMD</a> is a molecular dynamics mini-application, and
 its decomposition is the standard illustration of why sparse arrays exist. It uses two
@@ -1134,24 +1135,55 @@ table exercise does. They are mentioned here so that the shape of the mechanism 
 <li>
 <p><strong>A strided slice is not contiguous.</strong> Sending a column of a 2D block means copying it
    into a buffer first; the entry-method array parameter packs whatever contiguous range it
-   is given.</p>
+   is given. In three dimensions <em>no</em> face interior is contiguous, so every face needs a
+   pack step — the one free direction that 2D gives you does not survive.</p>
+</li>
+<li>
+<p><strong>Inserting the same index twice aborts — but only in a build with error checking.</strong>
+   The guard is a <code>CkAssertMsg</code>, which compiles to nothing when <code>CMK_ERROR_CHECKING</code> is off.
+   In a <code>--with-production</code> build a duplicate <code>insert()</code> is not caught at all. Watch for
+   index sets that overlap, such as a diagonal and a first row meeting at (0,0).</p>
+</li>
+<li>
+<p><strong>With a fixed boundary, the boundary halo must be right in <em>both</em> buffers.</strong> A
+   double-buffered stencil swaps <code>cur</code> and <code>next</code> every step. Interior ghosts are refilled
+   by neighbours each step, so they take care of themselves — but a boundary ghost that no
+   neighbour ever sends is only as good as what the buffer was initialised with. Setting it
+   in <code>cur</code> alone leaves the other buffer's boundary holding whatever <code>new float[]</code> returned,
+   and the program still <em>appears</em> to work, because fresh pages read as zero and zero is the
+   usual boundary value.</p>
 </li>
 </ol>
 <hr />
 <h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h2>
-<p><strong>1. Non-periodic boundaries.</strong> The stencil wraps at the edges, which makes every tile have
-exactly four neighbors. Change it so the grid has fixed boundaries: edge tiles have three
-neighbors and corner tiles two, with the outer boundary held at a constant value. What does
-<code>countEvent</code> have to become, and where does the expected count come from?</p>
-<p><strong>2. Three dimensions.</strong> Extend the stencil to a 3D grid with a seven-point stencil —
-<code>array [3D]</code>, six neighbors, six ghost faces per step. A face of a 3D block is strided in
-two ways rather than one; how much of the tile code has to change, and how much of the main
-chare?</p>
+<p><strong>1. Non-periodic boundaries.</strong> The stencil wraps at the edges, so every tile has exactly
+four neighbours. Change it so the grid has fixed boundaries: edge tiles have three
+neighbours, corner tiles two, and the outer boundary is held at a constant value. Two things
+have to change, and the second one is the interesting one.</p>
+<p>First, <code>countEvent</code> can no longer compare against a hard-coded 5. Where does the expected
+count come from, and when can it be computed?</p>
+<p>Second — and this is the part worth doing carefully — the boundary ghost cells are now never
+refilled by a neighbour, while <code>cur</code> and <code>next</code> are swapped every step. Get this wrong and
+the program will still run and still look like it converges. Before you trust it, fill the
+unused buffer with an obviously wrong value (<code>99.0f</code> everywhere) at construction and run it
+again. If the output changes, the program was reading memory it never wrote.</p>
+<p><strong>2. Three dimensions.</strong> Extend the stencil to a 3D grid with a seven-point stencil:
+<code>array [3D]</code>, six neighbours, six ghost faces per step. Before writing it, work out for each
+of the six faces whether its interior values are contiguous in a flat <code>(t+2)³</code> array. The
+answer determines how much of the 2D code carries over — in two dimensions, rows were
+contiguous and could be sent straight out of the array, and only columns had to be copied.
+Does either of those cases survive in 3D?</p>
+<p>You will also need a buffer to pack faces into. Is one buffer enough for all six sends in
+the same entry method, or does each send need its own? What property of entry-method
+invocation decides that?</p>
 <p><strong>3. A sparse array of your own.</strong> Create a 2D chare array in which only the elements on the
 diagonal and the first row exist, using <code>ckNew()</code>, <code>insert()</code> and <code>doneInserting()</code>. Have
 each element print its index and PE. Confirm that a broadcast reaches exactly the elements
 you inserted, and that a reduction over the array completes with only those elements
 contributing.</p>
+<p>Write the two insertion loops the obvious way first, without thinking about where they
+overlap, and run it. Then look up what the runtime told you, and check whether that
+diagnostic would still be there in a production build.</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <ul>
