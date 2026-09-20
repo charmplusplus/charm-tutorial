@@ -1,6 +1,6 @@
 # Exercise: Distributed Hash Table
 
-This exercise applies the SDAG skills from Chapter 3 to a classic distributed-systems
+This exercise applies the SDAG skills from Chapter 4 to a classic distributed-systems
 pattern: a **distributed hash table** (DHT). No new Charm++ concepts are introduced; the
 goal is to recognize where SDAG and plain entry methods each belong, and to appreciate
 what asynchronous messaging makes easy.
