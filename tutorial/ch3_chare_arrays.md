@@ -492,23 +492,39 @@ pairs are ever inserted.
 
 ## Exercises
 
-**1. Bidirectional ring.** Modify `ring` so that the token alternates direction: the element
-that receives it on an even trip passes it to `thisIndex + 1`, and on an odd trip to
-`thisIndex - 1` (wrapping correctly in both directions). Confirm from the output that the
-traversal really reverses.
+**1. Bidirectional ring.** Modify `ring` so that the token alternates direction: on an even
+trip it passes to `thisIndex + 1`, on an odd trip to `thisIndex - 1`, wrapping correctly in
+both directions. Confirm from the output that the traversal really reverses.
 
-**2. Two rings that share elements.** In `multiring`, all rings are separate arrays. Create
-instead a *single* array of N elements and run two tokens through it at once — one stepping
-by 1, one stepping by 2 — each with its own trip count, and exit when both have finished.
-What does each element need to know to keep the two tokens apart, and what happens if both
-tokens arrive at the same element at the same time?
+The interesting moment is the handoff between one trip and the next. When the element that
+ends a trip passes the token on, which direction should it use — the direction of the trip
+that just finished, or of the one about to start? Try the wrong one and watch what the token
+does.
 
-**3. Communication granularity.** Create an array `A` of 2 elements. `A[0]` is a producer
-and `A[1]` a consumer. `A[0]` generates N random doubles in batches of K, sending each batch
-to `A[1]` with an entry method `request`; `A[1]` squares each value and returns the batch
-with `response`. Take N and K from the command line. Time the whole run for a fixed N and a
-range of K from 1 to 10,000, and explain the shape of the curve — this is the grainsize
-experiment from Chapter 2, now measuring communication rather than computation.
+**2. Two tokens in one array.** In `multiring` each ring is a separate array. Instead, create
+a *single* array of N elements and run two tokens through it at once — one stepping by 1, one
+stepping by 2 — each with its own trip count, exiting when both have finished.
+
+Two questions to answer from the code, not from guessing. What does an element need to
+remember to keep the two tokens apart? And what happens if both tokens arrive at the same
+element at the same moment — can the two entry method invocations interleave?
+
+Then check something about the stride-2 token: have it report which elements it visited
+during one trip of N hops. Run it with N even and with N odd. If "one trip" means N hops,
+does the stride-2 token actually visit every element? What does the answer depend on?
+
+**3. Communication granularity.** Create an array `A` of 2 elements. `A[0]` is a producer and
+`A[1]` a consumer. `A[0]` generates N random doubles in batches of K, sending each batch to
+`A[1]` with an entry method `request`; `A[1]` squares each value and returns the batch with
+`response`. Take N and K from the command line. Time the whole run for a fixed N over a range
+of K from 1 to about 16,000, and explain the shape of both curves — seconds per batch, and
+seconds per value.
+
+Two conditions before the numbers mean anything. Build Charm++ **with `--with-production`**:
+a build with error checking on prints a banner telling you not to benchmark with it, and it
+means it. And decide whether `A[0]` fires all N/K batches immediately or waits for a response
+before sending the next. Try both. One of them measures how fast the pipeline runs; the other
+measures how long a round trip takes. Which is which, and which one has a memory problem?
 
 ---
 

@@ -426,23 +426,42 @@ any other element's data.
 
 ## Exercises
 
-**1. Mean and variance in one pass.** Give each element of a 1D array a vector of random
-doubles. Compute the mean and the variance of all the values across the whole array using
-reductions, in a single round — no second broadcast. (Hint: variance needs Σx and Σx², and
-one vector reduction can carry both, along with the count.)
+**1. Mean and variance.** Give each element of a 1D array a vector of random doubles.
+Compute the mean and the variance of all the values across the whole array using reductions.
+
+Start with the one-pass version: a single vector reduction carrying `[count, Σx, Σx²]`, from
+which mean and variance follow directly. Note that a contribution is one array of one type,
+so the count travels as a double along with the sums.
+
+Then test it. Generate the values as `uniform[0,1) + offset` and run with offset 0, then
+10³, then 10⁶, then 10⁸. The variance is the same in every case — the offset shifts the data
+without spreading it. Watch what your program reports. At some offset the answer starts to
+drift, and at some larger offset it goes **negative**, which a variance cannot be.
+
+Explain where the digits went, then fix it. The fix reuses the structure of this chapter:
+reduce something, broadcast it back, reduce again.
 
 **2. Maximum and where it is.** Find the largest value held by any element, *and* the index
 of the element holding it. Try it first with `CkReduction::max_double` alone and see what
-goes wrong: the maximum arrives without any indication of where it came from, and there is
-no built-in reducer that carries an index along with a value. Solve it with the concepts you
-have — reduce the maximum, broadcast it, and have the element that matches report itself.
-What happens if two elements hold the same maximum, and how would you make the answer
-deterministic?
+goes wrong: the maximum arrives with no indication of where it came from, and there is no
+built-in reducer that carries an index alongside a value.
+
+Solve it with the concepts you have — reduce the maximum, broadcast it back, and have the
+elements that match report themselves through a second reduction. Two things to get right.
+Make the answer deterministic when two elements hold the same maximum. And think about what
+the matching element compares: it is testing a floating-point value for exact equality, which
+is usually a mistake. Why is it safe here, and what would have to change about the first
+reduction to make it unsafe?
+
+If you generate the per-element values with `srand(some function of thisIndex)` followed by
+`rand()`, print them all before you start. You may find the maximum is always at the same
+end of the array, for reasons that have nothing to do with Charm++.
 
 **3. Rewrite the primes program.** Chapter 2's primality program counted completions in the
-main chare with a callback per chare. Rewrite it so the chares form an array and report
-their count of primes found through a single reduction. Compare the two versions for the
-amount of bookkeeping code in the main chare.
+main chare with a callback per chare. Rewrite it so the chares form an array, each testing a
+block of the range, and report the total through a single reduction. Compare the two versions
+for the amount of bookkeeping code in the main chare — that is where the difference shows up,
+not in the running time on a laptop with two worker PEs.
 
 ---
 
