@@ -457,11 +457,30 @@ If you generate the per-element values with `srand(some function of thisIndex)` 
 `rand()`, print them all before you start. You may find the maximum is always at the same
 end of the array, for reasons that have nothing to do with Charm++.
 
-**3. Rewrite the primes program.** Chapter 2's primality program counted completions in the
-main chare with a callback per chare. Rewrite it so the chares form an array, each testing a
-block of the range, and report the total through a single reduction. Compare the two versions
-for the amount of bookkeeping code in the main chare — that is where the difference shows up,
-not in the running time on a laptop with two worker PEs.
+**3. Rewrite the primes program, then choose its grainsize.** Chapter 2's primality program
+counted completions in the main chare with a callback per chare. Rewrite it so the chares
+form an array, each testing a block of the range, and report the total through a single
+reduction.
+
+Now use it to answer the question that decides how to decompose any problem: **how small can
+a chare's work get before the per-chare overhead matters?**
+
+Hold the total work fixed — all the primes below 2,000,000, say — and vary only the number
+of chares, from 1 up to more than 100,000. Run on **one PE**, and run the binary directly
+rather than through `charmrun`, so that what you are measuring is the cost of having chares
+at all, not load imbalance or communication. Plot total time against chare count, and
+against the resulting grain — the work per chare, which is the best total time divided by
+the chare count.
+
+The curve is flat over a wide range and then turns up. Find where the overhead first exceeds
+5% of the best time, read off the grain at that point, and extract the per-chare overhead
+*t_o* from the slope of the rising part. Compare *t_o* with the figure measured in Chapter 2,
+and check the rule of thumb from that chapter — grain ≥ 10–20 × *t_o* — against the grain you
+just measured at the 5% mark.
+
+Two things to be careful about. Build with `--with-production`: a build with error checking
+on will not give you a meaningful *t_o*. And take the minimum of several runs rather than one
+measurement, because a laptop running other things adds noise in one direction only.
 
 ---
 
