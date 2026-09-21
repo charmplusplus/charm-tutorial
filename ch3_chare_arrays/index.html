@@ -1294,21 +1294,33 @@ pairs are ever inserted.</p>
 </ol>
 <hr />
 <h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">&para;</a></h2>
-<p><strong>1. Bidirectional ring.</strong> Modify <code>ring</code> so that the token alternates direction: the element
-that receives it on an even trip passes it to <code>thisIndex + 1</code>, and on an odd trip to
-<code>thisIndex - 1</code> (wrapping correctly in both directions). Confirm from the output that the
-traversal really reverses.</p>
-<p><strong>2. Two rings that share elements.</strong> In <code>multiring</code>, all rings are separate arrays. Create
-instead a <em>single</em> array of N elements and run two tokens through it at once — one stepping
-by 1, one stepping by 2 — each with its own trip count, and exit when both have finished.
-What does each element need to know to keep the two tokens apart, and what happens if both
-tokens arrive at the same element at the same time?</p>
-<p><strong>3. Communication granularity.</strong> Create an array <code>A</code> of 2 elements. <code>A[0]</code> is a producer
-and <code>A[1]</code> a consumer. <code>A[0]</code> generates N random doubles in batches of K, sending each batch
-to <code>A[1]</code> with an entry method <code>request</code>; <code>A[1]</code> squares each value and returns the batch
-with <code>response</code>. Take N and K from the command line. Time the whole run for a fixed N and a
-range of K from 1 to 10,000, and explain the shape of the curve — this is the grainsize
-experiment from Chapter 2, now measuring communication rather than computation.</p>
+<p><strong>1. Bidirectional ring.</strong> Modify <code>ring</code> so that the token alternates direction: on an even
+trip it passes to <code>thisIndex + 1</code>, on an odd trip to <code>thisIndex - 1</code>, wrapping correctly in
+both directions. Confirm from the output that the traversal really reverses.</p>
+<p>The interesting moment is the handoff between one trip and the next. When the element that
+ends a trip passes the token on, which direction should it use — the direction of the trip
+that just finished, or of the one about to start? Try the wrong one and watch what the token
+does.</p>
+<p><strong>2. Two tokens in one array.</strong> In <code>multiring</code> each ring is a separate array. Instead, create
+a <em>single</em> array of N elements and run two tokens through it at once — one stepping by 1, one
+stepping by 2 — each with its own trip count, exiting when both have finished.</p>
+<p>Two questions to answer from the code, not from guessing. What does an element need to
+remember to keep the two tokens apart? And what happens if both tokens arrive at the same
+element at the same moment — can the two entry method invocations interleave?</p>
+<p>Then check something about the stride-2 token: have it report which elements it visited
+during one trip of N hops. Run it with N even and with N odd. If "one trip" means N hops,
+does the stride-2 token actually visit every element? What does the answer depend on?</p>
+<p><strong>3. Communication granularity.</strong> Create an array <code>A</code> of 2 elements. <code>A[0]</code> is a producer and
+<code>A[1]</code> a consumer. <code>A[0]</code> generates N random doubles in batches of K, sending each batch to
+<code>A[1]</code> with an entry method <code>request</code>; <code>A[1]</code> squares each value and returns the batch with
+<code>response</code>. Take N and K from the command line. Time the whole run for a fixed N over a range
+of K from 1 to about 16,000, and explain the shape of both curves — seconds per batch, and
+seconds per value.</p>
+<p>Two conditions before the numbers mean anything. Build Charm++ <strong>with <code>--with-production</code></strong>:
+a build with error checking on prints a banner telling you not to benchmark with it, and it
+means it. And decide whether <code>A[0]</code> fires all N/K batches immediately or waits for a response
+before sending the next. Try both. One of them measures how fast the pipeline runs; the other
+measures how long a round trip takes. Which is which, and which one has a memory problem?</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <ul>
