@@ -457,7 +457,26 @@ If you generate the per-element values with `srand(some function of thisIndex)` 
 `rand()`, print them all before you start. You may find the maximum is always at the same
 end of the array, for reasons that have nothing to do with Charm++.
 
-**3. Rewrite the primes program, then choose its grainsize.** Chapter 2's primality program
+**3. Out-of-order pairs.** Give each element of a 1D array of N elements a single number.
+Count how many *consecutive pairs* are out of increasing order — that is, how many indices i
+have `value(i) > value(i+1)`. Report the count to the main chare through one reduction.
+
+Unlike the primes program, this one cannot be written without the index. Work out who owns a
+pair, which way the value has to travel, and who does the comparing. Then answer three
+questions from the code:
+
+- One element at the end of the array owns no pair at all. What must it do anyway, and what
+  happens to the program if it does nothing?
+- Element i needs its neighbour's value and its own. Can the neighbour's message arrive
+  before the element's own constructor has set its value? What guarantees the answer?
+- If you write the neighbour index as `(i + 1) % N`, what does the program count?
+
+Check it three ways: a strictly ascending array (the answer is 0), a strictly descending one
+(N−1), and random values, where the count should sit near (N−1)/2 — for N = 10,000 you should
+see something close to 5,000. Generate the random values with a properly seeded generator
+rather than `srand(thisIndex)`; see the note in exercise 2.
+
+**4. Rewrite the primes program, then choose its grainsize.** Chapter 2's primality program
 counted completions in the main chare with a callback per chare. Rewrite it so the chares
 form an array, each testing a block of the range, and report the total through a single
 reduction.
